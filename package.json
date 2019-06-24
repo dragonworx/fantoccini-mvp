@@ -8,7 +8,7 @@
     "clean": "rm -rf ./public/build",
     "build-dev": "yarn clean && ./node_modules/.bin/webpack.cmd",
     "build-watch": "yarn clean && ./node_modules/.bin/webpack.cmd --watch",
-    "build-prod": "yarn clean && ./node_modules/.bin/webpack.cmd --env=production",
+    "build-prod": "yarn clean && ./node_modules/.bin/webpack.cmd --env=prod",
     "serve": "./node_modules/.bin/http-server ./public -c-1 -p 8080"
   },
   "dependencies": {

@@ -4,7 +4,7 @@ var OptimizeCssAssetsPlugin = require('optimize-css-assets-webpack-plugin');
 const package = require('./package.json');
 
 module.exports = (env) => {
-    const isProduction = env === 'production' || process.env.NODE_ENV === 'production';
+    const isProduction = env === 'prod' || process.env.NODE_ENV === 'production';
     console.log(chalk.cyan(`Fantoccini v${package.version} [${isProduction ? 'PROD' : 'DEV'}]`));
 
     return {
