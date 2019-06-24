@@ -2,7 +2,7 @@ import { Sequence } from "./sequence";
 import { PuppetString } from "./string";
 import { ISeekable } from '.';
 
-export class Motion<ValueType> implements ISeekable {
+export class Movement<ValueType> implements ISeekable {
   sequences: Sequence<ValueType>[] = [];
 
   constructor(readonly string: PuppetString<any, ValueType>) {

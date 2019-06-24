@@ -1,5 +1,5 @@
 import { Keyframe } from "./keyframe";
-import { Motion } from "./motion";
+import { Movement } from "./movement";
 import { EasingFn } from "./util";
 import { ISeekable } from '.';
 
@@ -11,7 +11,7 @@ export class Sequence<ValueType> implements ISeekable {
   shouldAlternate: boolean = false;
 
   constructor(
-      readonly motion: Motion<ValueType>,
+      readonly motion: Movement<ValueType>,
       readonly startTimeMs: number,
       readonly lengthMs?: number,
   ) {}

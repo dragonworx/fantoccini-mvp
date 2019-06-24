@@ -1,6 +1,6 @@
 import { PuppetString } from "./string";
 import { Timeline } from "./timeline";
-import { Motion } from "./motion";
+import { Movement } from "./movement";
 import { Sequence } from "./sequence";
 import { Keyframe } from "./keyframe";
 import { ISeekable, IPuppet } from '.';
@@ -52,7 +52,7 @@ export abstract class Puppet<PuppetType, PuppetInterface> implements IPuppet, IS
     return values;
   }
 
-  motion(key: keyof PuppetInterface): Motion<any> {
+  motion(key: keyof PuppetInterface): Movement<any> {
     return this.strings.get(key).motion;
   }
 

@@ -1,9 +1,9 @@
-import { Motion } from "./motion";
+import { Movement } from "./movement";
 import { Puppet } from "./puppet";
 import { IPuppetString, ISeekable } from '.';
 
 export class PuppetString<PuppetType, ValueType> implements IPuppetString, ISeekable {
-  motion: Motion<ValueType>;
+  motion: Movement<ValueType>;
   value: ValueType;
 
   constructor(
@@ -11,7 +11,7 @@ export class PuppetString<PuppetType, ValueType> implements IPuppetString, ISeek
     readonly key: string,
     readonly objectRef: PuppetType,
   ) {
-    this.motion = new Motion(this);
+    this.motion = new Movement(this);
     this.value = this.get();
   }
 

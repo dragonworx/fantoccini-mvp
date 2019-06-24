@@ -15,6 +15,6 @@ export * from './timeline';
 export * from './puppet';
 export * from './string';
 export * from './sequence';
-export * from './motion';
+export * from './movement';
 export * from './keyframe';
 export * from './util/easing';

@@ -4,12 +4,14 @@
   "main": "./public/js/bundle.js",
   "license": "MIT",
   "scripts": {
+    "start": "npm-run-all build-d serve-d",
     "test": "./node_modules/.bin/jest.cmd",
     "clean": "rm -rf ./public/build",
-    "build-dev": "yarn clean && ./node_modules/.bin/webpack.cmd",
-    "build-watch": "yarn clean && ./node_modules/.bin/webpack.cmd --watch",
-    "build-prod": "yarn clean && ./node_modules/.bin/webpack.cmd --env=prod",
-    "serve": "./node_modules/.bin/http-server ./public -c-1 -p 8080"
+    "build-d": "yarn clean && ./node_modules/.bin/webpack.cmd",
+    "build-w": "yarn clean && ./node_modules/.bin/webpack.cmd --watch",
+    "build-p": "yarn clean && ./node_modules/.bin/webpack.cmd --env=prod",
+    "serve-d": "./node_modules/.bin/http-server ./public -c-1 -p 3000",
+    "serve-p": "./node_modules/.bin/http-server ./public -c-1 -p 80"
   },
   "dependencies": {
     "@types/react": "^16.8.12",
@@ -27,6 +29,7 @@
     "less": "^3.9.0",
     "less-loader": "^5.0.0",
     "mini-css-extract-plugin": "^0.7.0",
+    "npm-run-all": "^4.1.5",
     "optimize-css-assets-webpack-plugin": "^5.0.1",
     "source-map-loader": "^0.2.4",
     "style-loader": "^0.23.1",
