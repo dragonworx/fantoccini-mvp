@@ -3,7 +3,7 @@ import { Component, createRef } from 'react';
 import { ReactCanvasSurface } from './surface';
 
 const isNum = (value: any) => typeof value === 'number';
-type MouseHandler = (x: number, y: number) => void;
+type MouseHandler = (x: number, y: number, surface: ReactCanvasSurface) => void;
 
 export interface GraphicsInfo {
     width: number;
@@ -21,8 +21,7 @@ export interface Props {
     height: number,
     innerWidth?: number,
     innerHeight?: number,
-    surface?: ReactCanvasSurface;
-    backgroundColor?: string;
+    draw?: (surface: ReactCanvasSurface) => void;
     onMouseOver?: MouseHandler;
     onMouseMove?: MouseHandler;
     onMouseOut?: MouseHandler;
@@ -106,8 +105,8 @@ export class ReactCanvas extends Component<Props, State> implements IReactCanvas
     componentDidMount() {
         this.setCanvasSizesFromProps();
         this.initSurface();
-        this.draw();
-        this.forceUpdate();
+        this.userDraw();
+        this.update();
     }
 
     setCanvasSizesFromProps() {
@@ -124,12 +123,20 @@ export class ReactCanvas extends Component<Props, State> implements IReactCanvas
         this.surface = new ReactCanvasSurface(this);
     }
 
+    userDraw() {
+        const { draw } = this.props;
+        if (draw) {
+            draw(this.surface);
+        }
+    }
+
     handleMouse = (callback?: MouseHandler) => {
         return (e: any) => {
             const x = e.clientX;
             const y = e.clientY;
             const { offsetLeft, offsetTop } = e.target as HTMLCanvasElement;
-            callback && callback(x - offsetLeft, y - offsetTop);
+            const { surface } = this;
+            surface && callback && callback(x - offsetLeft, y - offsetTop, surface);
         };
     }
 
@@ -155,15 +162,5 @@ export class ReactCanvas extends Component<Props, State> implements IReactCanvas
             >
             </canvas>
         )
-    }
-
-    draw() {
-        const { surface, props } = this;
-        const { backgroundColor } = props;
-        if (surface) {
-            if (backgroundColor) {
-                surface.layer('background').fill(backgroundColor);
-            }
-        }
     }
 }
