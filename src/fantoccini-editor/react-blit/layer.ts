@@ -1,4 +1,4 @@
-import { IReactCanvasGraphics } from "./reactCanvas";
+import { IReactCanvasGraphics } from "./blit";
 
 export class Layer {
     name: string;

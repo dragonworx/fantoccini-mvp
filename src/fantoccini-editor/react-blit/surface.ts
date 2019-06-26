@@ -1,5 +1,5 @@
 import { Layer } from './layer';
-import { IReactCanvasGraphics } from './reactCanvas';
+import { IReactCanvasGraphics } from './blit';
 
 interface DrawInfo {
     ctx: CanvasRenderingContext2D;
@@ -7,7 +7,7 @@ interface DrawInfo {
     height: number;
 }
 
-export class ReactCanvasSurface implements IReactCanvasGraphics {
+export class BlitSurface implements IReactCanvasGraphics {
     originX: number = 0;
     originY: number = 0;
     scaleX: number = 1;

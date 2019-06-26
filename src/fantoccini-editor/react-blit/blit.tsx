@@ -1,9 +1,9 @@
 import * as React from 'react';
 import { Component, createRef } from 'react';
-import { ReactCanvasSurface } from './surface';
+import { BlitSurface } from './surface';
 
 const isNum = (value: any) => typeof value === 'number';
-type MouseHandler = (x: number, y: number, surface: ReactCanvasSurface) => void;
+type MouseHandler = (x: number, y: number, surface: BlitSurface) => void;
 
 export interface GraphicsInfo {
     width: number;
@@ -21,7 +21,7 @@ export interface Props {
     height: number,
     innerWidth?: number,
     innerHeight?: number,
-    draw?: (surface: ReactCanvasSurface) => void;
+    draw?: (surface: BlitSurface) => void;
     onMouseOver?: MouseHandler;
     onMouseMove?: MouseHandler;
     onMouseOut?: MouseHandler;
@@ -31,8 +31,8 @@ export interface State {
 
 }
 
-export class ReactCanvas extends Component<Props, State> implements IReactCanvasGraphics {
-    surface: ReactCanvasSurface;
+export class Blit extends Component<Props, State> implements IReactCanvasGraphics {
+    surface: BlitSurface;
     onscreenRef = createRef<HTMLCanvasElement>();
     offscreen = document.createElement('canvas');
 
@@ -120,7 +120,7 @@ export class ReactCanvas extends Component<Props, State> implements IReactCanvas
     }
 
     initSurface() {
-        this.surface = new ReactCanvasSurface(this);
+        this.surface = new BlitSurface(this);
     }
 
     userDraw() {
@@ -154,7 +154,7 @@ export class ReactCanvas extends Component<Props, State> implements IReactCanvas
         const { props } = this;
         return (
             <canvas 
-                className="react-canvas" 
+                className="react-blit" 
                 ref={this.onscreenRef}
                 onMouseOver={this.handleMouse(props.onMouseOver)}
                 onMouseMove={this.handleMouse(props.onMouseMove)}
