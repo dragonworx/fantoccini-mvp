@@ -10,7 +10,7 @@ export class BlitSurface {
         readonly canvas: HTMLCanvasElement, 
         readonly width: number, 
         readonly height: number,
-        readonly onUpdate: () => void,
+        readonly updateCallback: () => void,
     ) {
         const buffer = new Buffer('background', canvas, width, height);
         this.buffers.push(buffer);
@@ -45,8 +45,9 @@ export class BlitSurface {
         return this;
     }
 
-    update() {
-        this.onUpdate();
+    refresh() {
+        this.updateCallback();
+        return this;
     }
 
     origin(x: number, y: number) {

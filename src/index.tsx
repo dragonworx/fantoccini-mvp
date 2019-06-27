@@ -1,7 +1,11 @@
+import './fantoccini-editor/less/main.less';
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-import { Editor } from './fantoccini-editor/editor';
+import { BlitExample1, BlitExample2 } from './fantoccini-editor/react-blit/examples';
 
-import './fantoccini-editor/less/main.less';
-
-ReactDOM.render(<Editor />, document.getElementById('main'));
+ReactDOM.render((
+    <>
+    <BlitExample1 />
+    <BlitExample2 />
+    </>
+), document.getElementById('main'));

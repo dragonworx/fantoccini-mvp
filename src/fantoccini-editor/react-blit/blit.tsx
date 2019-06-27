@@ -13,43 +13,34 @@ export interface Props {
     onMouseOver?: MouseHandler;
     onMouseMove?: MouseHandler;
     onMouseOut?: MouseHandler;
-    draw: (surface: BlitSurface) => void;
+    draw?: (surface: BlitSurface) => void;
 }
 
-export interface State {
-    
-}
-
-export class Blit extends Component<Props, State> {
+export class Blit extends Component<Props, {}> {
     surface?: BlitSurface;
-    onscreenRef = createRef<HTMLCanvasElement>();
-    offscreen = document.createElement('canvas');
+    onscreenCanvasRef = createRef<HTMLCanvasElement>();
+    offscreenCanvas: HTMLCanvasElement;
 
-    state = {
-    };
+    constructor(props: Props) {
+        super(props);
+        const { innerWidth, innerHeight } = this;
+        const offscreenCanvas = document.createElement('canvas');
+        offscreenCanvas.width = innerWidth;
+        offscreenCanvas.height = innerHeight;
+        this.offscreenCanvas = offscreenCanvas;
+        this.surface = new BlitSurface(offscreenCanvas, innerWidth, innerHeight, this.update);
+    }
 
-    get onscreen() {
-        return this.onscreenRef.current;
+    get onscreenCanvas() {
+        return this.onscreenCanvasRef.current;
     }
 
     get onscreenContext() {
-        return this.onscreen.getContext('2d');
+        return this.onscreenCanvas.getContext('2d');
     }
 
     get offscreenContext()  {
-        return this.offscreen.getContext('2d');
-    }
-
-    get sizes() {
-        const { width, height, innerWidth: iw, innerHeight: ih } = this.props;
-        const innerWidth = isNum(iw) ? iw : width;
-        const innerHeight = isNum(ih) ? ih : height;
-        return {
-            width,
-            height,
-            innerWidth,
-            innerHeight,
-        };
+        return this.offscreenCanvas.getContext('2d');
     }
 
     get width() {
@@ -70,75 +61,68 @@ export class Blit extends Component<Props, State> {
         return isNum(ih) ? ih : height;
     }
 
-    constructor(props: Props) {
-        super(props);
-    }
+    handleMouse = (selfCallback: MouseHandler, callback?: MouseHandler) => {
+        return (e: any) => {
+            const { offsetLeft, offsetTop } = e.target as HTMLCanvasElement;
+            const x = e.clientX - offsetLeft;
+            const y = e.clientY - offsetTop;
+            callback && callback(x, y);
+            selfCallback.call(this, x ,y);
+        };
+    };
+
+    onMouseOver(x: number, y: number) {
+    };
+
+    onMouseMove(x: number, y: number) {
+    };
+
+    onMouseOut(x: number, y: number) {   
+    };
 
     componentDidMount() {
-        this.setCanvasSizesFromProps();
-        this.initSurface();
+        const { draw } = this.props;
         this.draw();
+        draw && draw(this.surface);
         this.update();
     }
 
-    setCanvasSizesFromProps() {
-        const { onscreen, offscreen, width, height, innerWidth, innerHeight } = this;
-        onscreen.style.width = `${width}px`;
-        onscreen.style.height = `${height}px`;
-        onscreen.width = width;
-        onscreen.height = height;
-        offscreen.width = innerWidth;
-        offscreen.height = innerHeight;
-    }
-
-    initSurface() {
-        this.surface = new BlitSurface(this.offscreen, this.innerWidth, this.innerHeight, this.update);
-    }
-
     draw() {
-        const { surface } = this;
-        surface && this.props.draw(surface);
+        // subclasses can override...
     }
 
     update = () => {
-        const { surface, offscreenContext } = this;
+        const { surface, offscreenCanvas, onscreenContext, offscreenContext, width, height } = this;
         if (surface) {
+            onscreenContext.resetTransform();
+            onscreenContext.clearRect(0, 0, width, height);
             surface.buffers.forEach(buffer => {
                 if (buffer.ctx !== this.offscreenContext) {
                     offscreenContext.drawImage(buffer.canvas, buffer.x, buffer.y);
                 }
             });
+            const { originX, originY } = surface;
+            onscreenContext.translate(-originX, -originY);
+            onscreenContext.drawImage(offscreenCanvas, 0, 0);
         }
-        this.forceUpdate();
-    };
-
-    handleMouse = (callback?: MouseHandler) => {
-        return (e: any) => {
-            const x = e.clientX;
-            const y = e.clientY;
-            const { offsetLeft, offsetTop } = e.target as HTMLCanvasElement;
-            callback && callback(x - offsetLeft, y - offsetTop);
-        };
     };
 
     render() {
-        if (this.onscreen) {
-            const { onscreenContext, offscreen, surface } = this;
-            const { originX, originY } = surface;
-            if (onscreenContext) {
-                onscreenContext.resetTransform();
-                onscreenContext.translate(-originX, -originY);
-                onscreenContext.drawImage(offscreen, 0, 0);
-            }
-        }
-        const { props } = this;
+        const { props, width, height } = this;
+        const style = {
+            width: `${width}px`,
+            height: `${height}px`,
+        };
         return (
             <canvas 
+                ref={this.onscreenCanvasRef}
                 className="react-blit" 
-                ref={this.onscreenRef}
-                onMouseOver={this.handleMouse(props.onMouseOver)}
-                onMouseMove={this.handleMouse(props.onMouseMove)}
-                onMouseOut={this.handleMouse(props.onMouseOut)}
+                width={width}
+                height={height}
+                style={style}
+                onMouseOver={this.handleMouse(this.onMouseOver, props.onMouseOver)}
+                onMouseMove={this.handleMouse(this.onMouseMove, props.onMouseMove)}
+                onMouseOut={this.handleMouse(this.onMouseOut, props.onMouseOut)}
             >
             </canvas>
         )
