@@ -3,41 +3,30 @@ import { Component, createRef } from 'react';
 import { BlitSurface } from './surface';
 
 const isNum = (value: any) => typeof value === 'number';
-type MouseHandler = (x: number, y: number, surface: BlitSurface) => void;
-
-export interface GraphicsInfo {
-    width: number;
-    height: number;
-    ctx: CanvasRenderingContext2D;
-    canvas: HTMLCanvasElement;
-}
-export interface IReactCanvasGraphics {
-    info(): GraphicsInfo;
-    update(): void;
-}
+type MouseHandler = (x: number, y: number) => void;
 
 export interface Props {
     width: number,
     height: number,
     innerWidth?: number,
     innerHeight?: number,
-    draw?: (surface: BlitSurface) => void;
     onMouseOver?: MouseHandler;
     onMouseMove?: MouseHandler;
     onMouseOut?: MouseHandler;
+    draw: (surface: BlitSurface) => void;
 }
 
 export interface State {
-
+    
 }
 
-export class Blit extends Component<Props, State> implements IReactCanvasGraphics {
-    surface: BlitSurface;
+export class Blit extends Component<Props, State> {
+    surface?: BlitSurface;
     onscreenRef = createRef<HTMLCanvasElement>();
     offscreen = document.createElement('canvas');
 
     state = {
-    }
+    };
 
     get onscreen() {
         return this.onscreenRef.current;
@@ -85,27 +74,10 @@ export class Blit extends Component<Props, State> implements IReactCanvasGraphic
         super(props);
     }
 
-    info() {
-        return {
-            canvas: this.onscreen,
-            ctx: this.offscreenContext,
-            width: this.innerWidth,
-            height: this.innerHeight,
-        };
-    }
-
-    update() {
-        const { surface, offscreenContext } = this;
-        if (surface) {
-            surface.layers.forEach(layer => offscreenContext.drawImage(layer.canvas, 0, 0));
-        }
-        this.forceUpdate();
-    }
-
     componentDidMount() {
         this.setCanvasSizesFromProps();
         this.initSurface();
-        this.userDraw();
+        this.draw();
         this.update();
     }
 
@@ -120,33 +92,41 @@ export class Blit extends Component<Props, State> implements IReactCanvasGraphic
     }
 
     initSurface() {
-        this.surface = new BlitSurface(this);
+        this.surface = new BlitSurface(this.offscreen, this.innerWidth, this.innerHeight, this.update);
     }
 
-    userDraw() {
-        const { draw } = this.props;
-        if (draw) {
-            draw(this.surface);
-        }
+    draw() {
+        const { surface } = this;
+        surface && this.props.draw(surface);
     }
+
+    update = () => {
+        const { surface, offscreenContext } = this;
+        if (surface) {
+            surface.buffers.forEach(buffer => {
+                if (buffer.ctx !== this.offscreenContext) {
+                    offscreenContext.drawImage(buffer.canvas, buffer.x, buffer.y);
+                }
+            });
+        }
+        this.forceUpdate();
+    };
 
     handleMouse = (callback?: MouseHandler) => {
         return (e: any) => {
             const x = e.clientX;
             const y = e.clientY;
             const { offsetLeft, offsetTop } = e.target as HTMLCanvasElement;
-            const { surface } = this;
-            surface && callback && callback(x - offsetLeft, y - offsetTop, surface);
+            callback && callback(x - offsetLeft, y - offsetTop);
         };
-    }
+    };
 
     render() {
         if (this.onscreen) {
             const { onscreenContext, offscreen, surface } = this;
-            const { originX, originY, scaleX, scaleY } = surface;
+            const { originX, originY } = surface;
             if (onscreenContext) {
                 onscreenContext.resetTransform();
-                onscreenContext.scale(scaleX, scaleY);
                 onscreenContext.translate(-originX, -originY);
                 onscreenContext.drawImage(offscreen, 0, 0);
             }
