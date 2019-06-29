@@ -1,14 +1,15 @@
 const chalk = require('chalk');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
-var OptimizeCssAssetsPlugin = require('optimize-css-assets-webpack-plugin');
+const OptimizeCssAssetsPlugin = require('optimize-css-assets-webpack-plugin');
 const package = require('./package.json');
+const path = require('path');
 
 module.exports = (env) => {
     const isProduction = env === 'prod' || process.env.NODE_ENV === 'production';
     console.log(chalk.cyan(`Fantoccini v${package.version} [${isProduction ? 'PROD' : 'DEV'}]`));
 
     return {
-        entry: "./src/index.tsx",
+        entry: "./packages/index.tsx",
         output: {
             filename: "bundle.js",
             path: __dirname + "/public/build"
@@ -17,6 +18,9 @@ module.exports = (env) => {
         devtool: isProduction ? undefined : "#inline-source-map",
         resolve: {
             extensions: [".ts", ".tsx", ".js", ".json", ".less", ".css"],
+            alias: {
+                'react-blit': path.resolve(__dirname, 'packages/react-blit/'),
+            }
         },
         module: {
             rules: [

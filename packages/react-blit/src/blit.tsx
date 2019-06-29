@@ -5,7 +5,7 @@ import { BlitSurface } from './surface';
 const isNum = (value: any) => typeof value === 'number';
 type MouseHandler = (x: number, y: number) => void;
 
-export interface Props {
+export interface BlitProps {
     width: number,
     height: number,
     innerWidth?: number,
@@ -16,12 +16,12 @@ export interface Props {
     draw?: (surface: BlitSurface) => void;
 }
 
-export class Blit extends Component<Props, {}> {
+export class Blit extends Component<BlitProps, {}> {
     surface?: BlitSurface;
     onscreenCanvasRef = createRef<HTMLCanvasElement>();
     offscreenCanvas: HTMLCanvasElement;
 
-    constructor(props: Props) {
+    constructor(props: BlitProps) {
         super(props);
         const { innerWidth, innerHeight } = this;
         const offscreenCanvas = document.createElement('canvas');
