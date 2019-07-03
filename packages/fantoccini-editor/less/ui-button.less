@@ -1,0 +1,29 @@
+@import (reference) "./ui-base";
+
+.ui-button {
+    .ui-base();
+    color: #333;
+    min-width: 16px;
+    min-height: 16px;
+    padding: 5px;
+    text-shadow: -1px -1px 1px rgba(0,0,0,0.3);
+    font-family: Verdana, Geneva, Tahoma, sans-serif;
+    box-shadow: inset 1px 1px 2px rgba(255, 255, 255, 0.6);
+}
+
+.ui-button-rollover {
+    background: linear-gradient(0deg, #000 0, #999 100%);
+    box-shadow: inset 1px 1px 2px rgba(0, 0, 0, 0.6);
+    color: white;
+}
+
+.ui-button-down {
+    background: black;
+    color: white;
+}
+
+.ui-button-toggled {
+    background: linear-gradient(0deg, #909090 0, #838383 100%);
+    box-shadow: inset 1px 2px 5px rgba(0, 0, 0, 0.6);
+    color: white;
+}
