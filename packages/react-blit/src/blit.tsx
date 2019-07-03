@@ -6,8 +6,8 @@ const isNum = (value: any) => typeof value === 'number';
 type MouseHandler = (x: number, y: number) => void;
 
 export interface BlitProps {
-    width: number,
-    height: number,
+    width?: number,
+    height?: number,
     innerWidth?: number,
     innerHeight?: number,
     onMouseOver?: MouseHandler;
@@ -16,19 +16,24 @@ export interface BlitProps {
     draw?: (surface: BlitSurface) => void;
 }
 
+export interface BlitDrawingContext {
+    surface: BlitSurface,
+    width: number,
+    height: number,
+    innerWidth: number,
+    innerHeight: number,
+    originX: number,
+    originY: number,
+}
+
 export class Blit extends Component<BlitProps, {}> {
     surface?: BlitSurface;
     onscreenCanvasRef = createRef<HTMLCanvasElement>();
-    offscreenCanvas: HTMLCanvasElement;
 
     constructor(props: BlitProps) {
         super(props);
         const { innerWidth, innerHeight } = this;
-        const offscreenCanvas = document.createElement('canvas');
-        offscreenCanvas.width = innerWidth;
-        offscreenCanvas.height = innerHeight;
-        this.offscreenCanvas = offscreenCanvas;
-        this.surface = new BlitSurface(offscreenCanvas, innerWidth, innerHeight, this.update);
+        this.surface = new BlitSurface(innerWidth, innerHeight, this.update);
     }
 
     get onscreenCanvas() {
@@ -37,10 +42,6 @@ export class Blit extends Component<BlitProps, {}> {
 
     get onscreenContext() {
         return this.onscreenCanvas.getContext('2d');
-    }
-
-    get offscreenContext()  {
-        return this.offscreenCanvas.getContext('2d');
     }
 
     get width() {
@@ -52,13 +53,22 @@ export class Blit extends Component<BlitProps, {}> {
     }
 
     get innerWidth() {
-        const { width, innerWidth: iw } = this.props;
+        const { width } = this;
+        const { innerWidth: iw } = this.props;
         return isNum(iw) ? iw : width;
     }
 
     get innerHeight() {
-        const { height, innerHeight: ih } = this.props;
+        const { height } = this;
+        const { innerHeight: ih } = this.props;
         return isNum(ih) ? ih : height;
+    }
+
+    componentDidMount() {
+        const { draw } = this.props;
+        this.draw();
+        draw && draw(this.surface);
+        this.update();
     }
 
     handleMouse = (selfCallback: MouseHandler, callback?: MouseHandler) => {
@@ -80,30 +90,24 @@ export class Blit extends Component<BlitProps, {}> {
     onMouseOut(x: number, y: number) {   
     };
 
-    componentDidMount() {
-        const { draw } = this.props;
-        this.draw();
-        draw && draw(this.surface);
-        this.update();
-    }
-
     draw() {
         // subclasses can override...
+        const { draw } = this.props;
+        draw && draw(this.surface);
     }
 
     update = () => {
-        const { surface, offscreenCanvas, onscreenContext, offscreenContext, width, height } = this;
+        const { surface, onscreenContext, width, height } = this;
+        const { originX, originY } = surface;
         if (surface) {
             onscreenContext.resetTransform();
             onscreenContext.clearRect(0, 0, width, height);
-            surface.buffers.forEach(buffer => {
-                if (buffer.ctx !== this.offscreenContext) {
-                    offscreenContext.drawImage(buffer.canvas, buffer.x, buffer.y);
+            onscreenContext.translate(-originX, -originY);
+            surface.eachBuffer(buffer => {
+                if (buffer.visible) {
+                    onscreenContext.drawImage(buffer.canvas, buffer.x, buffer.y);
                 }
             });
-            const { originX, originY } = surface;
-            onscreenContext.translate(-originX, -originY);
-            onscreenContext.drawImage(offscreenCanvas, 0, 0);
         }
     };
 

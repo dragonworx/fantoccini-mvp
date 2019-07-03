@@ -12,33 +12,31 @@ export class BlitExample1 extends Component<{}, {}> {
         if (this.surface) {
             this.surface
                 .origin(x, y)
-                .grid(1, 1, 100, 100, 'blue', 10, 4)
-                .refresh();
+                .grid(1, 1, 100, 100, 10, 4, 'blue')
+                .blit();
         }
     };
 
     draw = (surface: BlitSurface) => {
         this.surface = surface
             .fill('green')
-            .grid(0, 0, 100, 100, 'red', 10, 4)
+            .grid(0, 0, 100, 100, 10, 4, 'red')
             .line(0, 0, 4000, 300, 'blue')
             .line(4000, 0, 0, 300, 'blue')
-            .refresh();
+            .blit();
     };
 
     render() {
         return (
-            <div className="editor">
-                <Blit
-                    width={400} 
-                    height={300} 
-                    innerWidth={4000}
-                    innerHeight={3000}
-                    draw={this.draw}
-                    onMouseMove={this.onMouseMove}
-                >
-                </Blit>
-            </div>
+            <Blit
+                width={400} 
+                height={300} 
+                innerWidth={4000}
+                innerHeight={3000}
+                draw={this.draw}
+                onMouseMove={this.onMouseMove}
+            >
+            </Blit>
         )
     }
 }
@@ -48,13 +46,11 @@ export class BlitExample2 extends Component<{}, {}> {
 
     render() {
         return (
-            <div className="editor">
-                <TestBlit
-                    width={400} 
-                    height={300}
-                >
-                </TestBlit>
-            </div>
+            <TestBlit
+                width={400} 
+                height={300}
+            >
+            </TestBlit>
         )
     }
 }
