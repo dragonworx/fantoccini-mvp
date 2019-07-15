@@ -5,7 +5,9 @@ import { UIButton } from './button';
 import '../../less/ui-checkbox.less';
 
 export interface Props {
-    isChecked: boolean;
+    isChecked?: boolean;
+    name?: string;
+    onChange?: (isChecked: boolean, name?: string) => void;
 }
 
 export const defaultProps: Partial<Props> = {
@@ -13,7 +15,7 @@ export const defaultProps: Partial<Props> = {
 };
 
 export interface State {
-    isChecked: boolean,
+    isChecked?: boolean,
 }
 
 export class UICheckbox extends Component<Props, State> {
@@ -21,7 +23,12 @@ export class UICheckbox extends Component<Props, State> {
         isChecked: this.props.isChecked,
     };
 
-    onClick = () => this.setState({ isChecked: !this.state.isChecked });
+    onClick = () => {
+        const isChecked = !this.state.isChecked;
+        const { name, onChange } = this.props;
+        this.setState({ isChecked: isChecked });
+        onChange && onChange(isChecked, name);
+    };
 
     render() {
         const { isChecked } = this.state;
@@ -35,4 +42,11 @@ export class UICheckbox extends Component<Props, State> {
             </UIButton>
         )
     }
+
+    componentDidUpdate(prevProps: Props, prevState: Props) {
+        const { isChecked } = this.props;
+        if (prevProps.isChecked !== isChecked) {
+            this.setState({ isChecked: isChecked })
+        }
+      }
 }

@@ -5,6 +5,16 @@ import { UICheckbox } from './checkbox';
 import '../../less/ui-radio.less';
 
 export class UIRadioButton extends UICheckbox {
+    onClick = () => {
+        if (this.state.isChecked) {
+            return;
+        }
+        const isChecked = !this.state.isChecked;
+        const { name, onChange } = this.props;
+        this.setState({ isChecked: isChecked });
+        onChange && onChange(isChecked, name);
+    };
+
     render() {
         const { isChecked } = this.state;
         return (
