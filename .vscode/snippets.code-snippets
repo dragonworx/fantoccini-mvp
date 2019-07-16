@@ -1,0 +1,20 @@
+{
+	"React Component": {
+		"prefix": "reactcomp",
+		"body": [
+			"import * as React from 'react';",
+			"import { Component } from 'react';",
+			"",
+			"export interface Props {",
+			"}",
+			"",
+			"export interface State {",
+			"}",
+			"",
+			"export class $1 extends Component<Props, State> {",
+			"}",
+			"",
+		],
+		"description": "Create new React Component"
+	}
+}

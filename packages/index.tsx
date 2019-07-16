@@ -8,7 +8,7 @@ import { UIRadioButtonGroup } from './fantoccini-editor/src/components/radioGrou
 import { UIGrid, UIGridRow, UIGridCell } from './fantoccini-editor/src/components/grid';
 import { UIPanel } from './fantoccini-editor/src/components/panel';
 import { UILabel } from './fantoccini-editor/src/components/label';
-import { UIButtonGroup } from './fantoccini-editor/src/components/buttonGroup';
+// import { UIButtonGroup } from './fantoccini-editor/src/components/buttonGroup';
 
 import './fantoccini-editor/less/main.less';
 

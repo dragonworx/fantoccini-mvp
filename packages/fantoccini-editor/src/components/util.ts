@@ -17,3 +17,8 @@ export interface HTMLElementProps {
     id?: string;
     className?: string;
 }
+
+export interface UIInputProps {
+    value: any;
+    onChange: () => void;
+}
