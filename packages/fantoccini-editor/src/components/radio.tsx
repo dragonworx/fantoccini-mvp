@@ -1,7 +1,7 @@
 import * as React from 'react';
 import { UIButton } from './button';
 import { UICheckbox } from './checkbox';
-
+import { UILabel } from './label';
 import '../../less/ui-radio.less';
 
 export class UIRadioButton extends UICheckbox {
@@ -17,15 +17,26 @@ export class UIRadioButton extends UICheckbox {
 
     render() {
         const { isChecked } = this.state;
-        return (
+        const { label, id, className } = this.props;
+        const content = (
             <UIButton 
+                id={id}
+                className={`ui-checkbox ui-radio ${className || ''}`.trim()}
                 radius={20}
                 onClick={this.onClick}
-                className="ui-checkbox ui-radio" 
                 toggled={this.state.isChecked}
             >
                 {isChecked ? <span className="radio"></span> : <span>&nbsp;</span>}
             </UIButton>
-        )
+        );
+        if (label) {
+            return (
+                <span className="ui-checkbox-container">
+                    {content}
+                    <UILabel>{label}</UILabel>
+                </span>
+            )
+        }
+        return content;
     }
 }

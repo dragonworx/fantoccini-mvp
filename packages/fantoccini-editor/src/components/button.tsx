@@ -1,6 +1,6 @@
 import * as React from 'react';
 import { Component } from 'react';
-
+import { HTMLElementProps } from './util';
 import '../../less/ui-button.less';
 
 export enum UIButtonState {
@@ -17,14 +17,12 @@ export interface EventProps {
     onClick?: () => void;
 }
 
-export interface Props extends EventProps {
-    className?: string;
+export interface Props extends EventProps, HTMLElementProps {
     toggled: boolean;
     radius: number;
 };
 
 export const defaultProps: Partial<Props> = {
-    className: '',
     toggled: false,
     radius: 5,
 };
@@ -52,10 +50,11 @@ export class UIButton extends Component<Props, State> {
 
     renderButtonWithClass(cssClass: string) {
         const { state } = this.state;
-        const { className, toggled, radius } = this.props;
+        const { className, toggled, radius, id } = this.props;
         return (
             <button
-                className={`ui-button ui-button-${cssClass} ${className} ${state !== UIButtonState.rollover && toggled ? 'ui-button-toggled' : ''}`}
+                id={id}
+                className={`ui-button ui-button-${cssClass} ${className || ''} ${state !== UIButtonState.rollover && toggled ? 'ui-button-toggled' : ''}`.trim()}
                 onMouseOver={this.onMouseOver}
                 onMouseOut={this.onMouseOut}
                 onMouseDown={this.onMouseDown}

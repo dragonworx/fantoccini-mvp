@@ -1,20 +1,20 @@
 import * as React from 'react';
 import { Component, ReactElement } from 'react';
-import { Props as UIRadioButtonProps } from './checkbox';
-import { cloneChildren, HTMLElementProps } from './util';
+import { Props as UIButtonProps } from './button';
+import { cloneChildren } from './util';
 
-export interface Props extends HTMLElementProps {
+export interface Props {
     selected: string;
     direction: 'vertical' | 'horizontal';
     onChange?: (selected: string) => void;
-    children: ReactElement<UIRadioButtonProps>[];
+    children: ReactElement<UIButtonProps>[];
 }
 
 export interface State {
     currentName?: string;
 }
 
-export class UIRadioButtonGroup extends Component<Props, State> {
+export class UIButtonGroup extends Component<Props, State> {
     state: State = {
         currentName: this.props.selected,
     };
@@ -34,11 +34,11 @@ export class UIRadioButtonGroup extends Component<Props, State> {
 
     render() {
         const { currentName } = this.state;
-        const { direction, id, className } = this.props;
-        const children = cloneChildren(this.props.children, (child: ReactElement<UIRadioButtonProps>) => ({
+        const { direction } = this.props;
+        const children = cloneChildren(this.props.children, (child: ReactElement<UIButtonProps>) => ({
             onChange: this.onChange,
-            isChecked: currentName === child.props.name,
+            isChecked: currentName === child.props.id,
         }));
-        return <div id={id} className={`ui-radio-group ui-radio-group-${direction} ${className || ''}`.trim()}>{children}</div>;
+        return <div className={`ui-radio-group ui-radio-group-${direction}`}>{children}</div>;
     }
 }

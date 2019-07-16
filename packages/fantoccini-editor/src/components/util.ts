@@ -12,3 +12,8 @@ export function cloneChildren(propsChildren: React.ReactNode, resolver: (child: 
     });
     return children;
 }
+
+export interface HTMLElementProps {
+    id?: string;
+    className?: string;
+}

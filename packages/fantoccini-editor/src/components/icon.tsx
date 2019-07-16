@@ -1,9 +1,10 @@
 import * as React from 'react';
 import { Component } from 'react';
+import { HTMLElementProps } from './util';
 
 import '../../less/ui-icon.less';
 
-export interface Props {
+export interface Props extends HTMLElementProps {
     src: string;
     size?: number;
 }
@@ -20,8 +21,8 @@ export class UIIcon extends Component<Props, State> {
     static defaultProps = defaultProps;
 
     render() {
-        const { src, size } = this.props;
-        return <img className="ui-icon" src={src} style={{ width: size }} />;
+        const { src, size, id, className } = this.props;
+        return <img id={id} className={`ui-icon ${className}`.trim()} src={src} style={{ width: size }} />;
         
     }
 }

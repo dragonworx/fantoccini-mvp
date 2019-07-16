@@ -6,25 +6,35 @@ import { UICheckbox } from './fantoccini-editor/src/components/checkbox';
 import { UIRadioButton } from './fantoccini-editor/src/components/radio';
 import { UIRadioButtonGroup } from './fantoccini-editor/src/components/radioGroup';
 import { UIGrid, UIGridRow, UIGridCell } from './fantoccini-editor/src/components/grid';
+import { UIPanel } from './fantoccini-editor/src/components/panel';
+import { UILabel } from './fantoccini-editor/src/components/label';
+import { UIButtonGroup } from './fantoccini-editor/src/components/buttonGroup';
 
 import './fantoccini-editor/less/main.less';
 
 ReactDOM.render((
-    <>
-        <UIButton onClick={() => console.log("clicked")}>
+    <div id="example">
+        <UIButton id="button1" className="button1" onClick={() => console.log("clicked")}>
             foo
-            <UIIcon src="./favicon.ico" />
+            <UIIcon id="icon1" className="icon1" src="./favicon.ico" />
         </UIButton>
-        <UICheckbox isChecked={true} onChange={(isChecked: boolean) => console.log({isChecked})} />
-        <UIRadioButton onChange={(isChecked: boolean) => console.log({isChecked})} />
-        <UIRadioButtonGroup selected="b" onChange={(selected: string) => console.log({selected})}>
-            <UIRadioButton name="a" />
-            <UIRadioButton name="b" />
-            <UIRadioButton name="c" />
+        <UICheckbox id="checkbox1" className="checkbox1" isChecked={true} onChange={(isChecked: boolean) => console.log({isChecked})} />
+        <UIRadioButton id="radio1" className="radio1"  onChange={(isChecked: boolean) => console.log({isChecked})} />
+        <UICheckbox label="Checkbox" isChecked={true} onChange={(isChecked: boolean) => console.log({isChecked})} />
+        <UIRadioButton label="Radio" onChange={(isChecked: boolean) => console.log({isChecked})} />
+        <UIRadioButtonGroup id="radiogroup1" className="radiogroup1" selected="b" onChange={(selected: string) => console.log({selected})}>
+            <UIRadioButton name="a" label="a" />
+            <UIRadioButton name="b" label="b" />
+            <UIRadioButton name="c" label="c" />
         </UIRadioButtonGroup>
-        <UIGrid>
-            <UIGridRow>
-                <UIGridCell>1</UIGridCell>
+        <UIRadioButtonGroup direction="vertical" selected="b" onChange={(selected: string) => console.log({selected})}>
+            <UIRadioButton name="a" label="a" />
+            <UIRadioButton name="b" label="b" />
+            <UIRadioButton name="c" label="c" />
+        </UIRadioButtonGroup>
+        <UIGrid id="grid1" className="grid1">
+            <UIGridRow id="grid-row1" className="grid-row1">
+                <UIGridCell id="grid-cell1" className="grid-cell1">1</UIGridCell>
                 <UIGridCell>2</UIGridCell>
                 <UIGridCell>3</UIGridCell>
             </UIGridRow>
@@ -44,5 +54,19 @@ ReactDOM.render((
                 <UIGridCell>12</UIGridCell>
             </UIGridRow>
         </UIGrid>
-    </>
+        <UIPanel id="panel1" className="panel1">
+            Panel
+            <UILabel id="label1" className="label1">Label <UIIcon src="./favicon.ico" /></UILabel>
+        </UIPanel>
+        {/* <UIButtonGroup selected="b" onChange={(selected: string) => console.log({selected})}>
+            <UIButton>a</UIButton>
+            <UIButton>b</UIButton>
+            <UIButton>c</UIButton>
+        </UIButtonGroup>
+        <UIButtonGroup direction="vertical" selected="b" onChange={(selected: string) => console.log({selected})}>
+            <UIButton id="a">a</UIButton>
+            <UIButton>b</UIButton>
+            <UIButton>c</UIButton>
+        </UIButtonGroup> */}
+    </div>
 ), document.getElementById('main'));

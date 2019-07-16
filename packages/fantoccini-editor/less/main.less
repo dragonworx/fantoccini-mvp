@@ -12,9 +12,15 @@ html, body {
 
 #main {
     .fill();
-    background-color: rgb(147, 171, 215);
-    @grid-url: "/img/grid.png";
-    background-image: url("@{grid-url}");
+    // background-color: rgb(147, 171, 215);
+    background-color: #333;
+    // @grid-url: "/img/grid.png";
+    // background-image: url("@{grid-url}");
+}
+
+#example {
+    display: flex;
+    flex-direction: column;
 }
 
 .react-blit {
@@ -26,10 +32,14 @@ html, body {
 
 .ui-grid {
     background-color: #ccc;
-    width: 90%;
 }
 
 .ui-grid-cell {
     border: 1px solid white;
-    height: 50px;
+    height: 35px;
+}
+
+.ui-panel {
+    width: 130px;
+    height: 100px;
 }
