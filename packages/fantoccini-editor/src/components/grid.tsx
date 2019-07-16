@@ -9,11 +9,6 @@ export interface UIGridAlignProps extends HTMLElementProps {
 }
 
 export class UIGridElement extends Component<UIGridAlignProps, {}> {
-    static defaultProps = {
-        hAlign: 'left',
-        vAlign: 'top',
-    };
-
     cloneChildrenWithProps() {
         const { hAlign, vAlign } = this.props;
         return cloneChildren(this.props.children, (child: ReactElement<UIGridAlignProps>) => ({
@@ -40,7 +35,9 @@ export class UIGridRow extends UIGridElement {
 export class UIGridCell extends UIGridElement {
     render() {
         const { hAlign, vAlign, id, className } = this.props;
-        const cssName = `ui-grid-cell ui-grid-cell-h-${hAlign} ui-grid-cell-v-${vAlign} ${className || ''}`.trim();
+        const hClassName = hAlign ? 'ui-grid-cell-h-' + hAlign : '';
+        const vClassName = vAlign ? 'ui-grid-cell-v-' + vAlign : '';
+        const cssName = `ui-grid-cell ${hClassName} ${vClassName} ${className || ''}`.trim();
         return <div id={id} className={cssName}>{this.props.children}</div>
     }
 }
