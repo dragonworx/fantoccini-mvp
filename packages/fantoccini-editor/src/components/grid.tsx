@@ -41,3 +41,31 @@ export class UIGridCell extends UIGridElement {
         return <div id={id} className={cssName}>{this.props.children}</div>
     }
 }
+
+export class HLayout extends UIGridElement {
+    render() {
+        const { children, id, className, hAlign, vAlign} = this.props;
+        const childs = React.Children.map(children, (child: ReactElement) => <UIGridCell>{child}</UIGridCell>) || [];
+        return (
+            <UIGrid id={id} className={`ui-h-layout ${className || ''}`}>
+                {childs.length ? (
+                    <UIGridRow hAlign={hAlign} vAlign={vAlign}>
+                        {childs}
+                    </UIGridRow>
+                ) : null}
+            </UIGrid>
+        )
+    }
+}
+
+export class VLayout extends UIGridElement {
+    render() {
+        const { children, id, className, hAlign, vAlign} = this.props;
+        const childs = React.Children.map(children, (child: ReactElement) => <UIGridRow hAlign={hAlign} vAlign={vAlign}><UIGridCell>{child}</UIGridCell></UIGridRow>) || [];
+        return (
+            <UIGrid id={id} className={`ui-v-layout ${className || ''}`}>
+                {childs.length ? childs : null}
+            </UIGrid>
+        )
+    }
+}

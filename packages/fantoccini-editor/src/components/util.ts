@@ -1,14 +1,12 @@
 import * as React from 'react';
 
 export function cloneChildren(propsChildren: React.ReactNode, resolver: (child: React.ReactElement<any>) => {}) {
-    const children: any[] = [];
-    (propsChildren as []).forEach((child: React.ReactElement<any>, i: number) => {
+    const children: any[] = React.Children.map(propsChildren, (child: React.ReactElement<any>, i: number) => {
         const props = {
             key: i,
             ...resolver(child)
         };
-        const clone = React.cloneElement(child, props) as any;
-        children.push(clone);
+        return React.cloneElement(child, props) as any;
     });
     return children;
 }
@@ -18,7 +16,9 @@ export interface HTMLElementProps {
     className?: string;
 }
 
-export interface UIInputProps {
-    value: any;
-    onChange: () => void;
+export interface UIInputGroupItemProps {
+    name?: string;
+    isChecked?: any;
+    isGroupSelected?: boolean;
+    onChange?: (valisCheckedue: boolean, name?: string) => void;
 }

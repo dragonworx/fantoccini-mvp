@@ -2,54 +2,51 @@ import * as React from 'react';
 import { Component } from 'react';
 import { UIButton } from './button';
 import { UILabel } from './label';
-import { HTMLElementProps } from './util';
+import { HTMLElementProps, UIInputGroupItemProps } from './util';
 import '../../less/ui-checkbox.less';
 
-export interface Props extends HTMLElementProps {
-    isChecked?: boolean;
-    name?: string;
+export interface Props extends HTMLElementProps, UIInputGroupItemProps {
     label?: string;
-    onChange?: (isChecked: boolean, name?: string) => void;
+    position?: 'before' | 'after';
 }
 
 export const defaultProps: Partial<Props> = {
-    isChecked: true,
+    isChecked: false,
 };
 
 export interface State {
-    isChecked?: boolean,
+    checked: boolean,
 }
 
 export class UICheckbox extends Component<Props, State> {
     state = {
-        isChecked: this.props.isChecked,
+        checked: this.props.isChecked,
     };
 
     onClick = () => {
-        const isChecked = !this.state.isChecked;
-        const { name, onChange } = this.props;
-        this.setState({ isChecked: isChecked });
+        const isChecked = !this.state.checked;
+        const { onChange, name } = this.props;
+        this.setState({ checked: isChecked });
         onChange && onChange(isChecked, name);
     };
 
     render() {
-        const { isChecked } = this.state;
-        const { label, id, className } = this.props;
+        const { checked } = this.state;
+        const { label, id, className, position } = this.props;
         const content = (
             <UIButton 
                 id={id}
                 className={`ui-checkbox ${className || ''}`.trim()}
                 onClick={this.onClick}
-                toggled={this.state.isChecked}
+                toggled={checked}
             >
-                {isChecked ? <span>x</span> : <span>&nbsp;</span>}
+                {checked ? <span>x</span> : <span>&nbsp;</span>}
             </UIButton>
         );
         if (label) {
             return (
                 <span className="ui-checkbox-container">
-                    {content}
-                    <UILabel>{label}</UILabel>
+                    <UILabel text={label} position={position}>{content}</UILabel>
                 </span>
             )
         }
@@ -57,9 +54,16 @@ export class UICheckbox extends Component<Props, State> {
     }
 
     componentDidUpdate(prevProps: Props) {
-        const { isChecked } = this.props;
+        const { isChecked, isGroupSelected } = this.props;
+        let checked: boolean | undefined;
         if (prevProps.isChecked !== isChecked) {
-            this.setState({ isChecked: isChecked })
+            checked = isChecked;
+        }
+        if (prevProps.isGroupSelected === true && isGroupSelected === false) {
+            checked = false;
+        }
+        if (checked !== undefined) {
+            this.setState({ checked });
         }
       }
 }

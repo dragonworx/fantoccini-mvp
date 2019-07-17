@@ -6,25 +6,25 @@ import '../../less/ui-radio.less';
 
 export class UIRadioButton extends UICheckbox {
     onClick = () => {
-        if (this.state.isChecked) {
+        if (this.state.checked) {
             return;
         }
-        const isChecked = !this.state.isChecked;
-        const { name, onChange } = this.props;
-        this.setState({ isChecked: isChecked });
-        onChange && onChange(isChecked, name);
+        const { onChange, name } = this.props;
+        this.setState({ checked: true });
+        onChange && onChange(true, name);
     };
 
     render() {
-        const { isChecked } = this.state;
-        const { label, id, className } = this.props;
+        const { checked } = this.state;
+        const { label, id, className, isGroupSelected, position } = this.props;
+        const isChecked = isGroupSelected === true ? true : checked;
         const content = (
             <UIButton 
                 id={id}
                 className={`ui-checkbox ui-radio ${className || ''}`.trim()}
                 radius={20}
                 onClick={this.onClick}
-                toggled={this.state.isChecked}
+                toggled={isChecked}
             >
                 {isChecked ? <span className="radio"></span> : <span>&nbsp;</span>}
             </UIButton>
@@ -32,8 +32,7 @@ export class UIRadioButton extends UICheckbox {
         if (label) {
             return (
                 <span className="ui-checkbox-container">
-                    {content}
-                    <UILabel>{label}</UILabel>
+                    <UILabel position={position} text={label}>{content}</UILabel>
                 </span>
             )
         }
