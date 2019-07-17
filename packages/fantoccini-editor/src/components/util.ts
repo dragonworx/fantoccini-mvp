@@ -20,5 +20,5 @@ export interface UIInputGroupItemProps {
     name?: string;
     isChecked?: any;
     isGroupSelected?: boolean;
-    onChange?: (valisCheckedue: boolean, name?: string) => void;
+    onChange?: (isChecked: boolean, name?: string) => void;
 }

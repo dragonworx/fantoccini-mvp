@@ -22,7 +22,6 @@ export class UIRadioButton extends UICheckbox {
             <UIButton 
                 id={id}
                 className={`ui-checkbox ui-radio ${className || ''}`.trim()}
-                radius={20}
                 onClick={this.onClick}
                 toggled={isChecked}
             >

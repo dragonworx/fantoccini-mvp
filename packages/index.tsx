@@ -14,46 +14,63 @@ const onChange = (isChecked: boolean) => console.log({ isChecked });
 
 ReactDOM.render((
     <div id="example">
-        <UIPanel>
-            Button
-            <UIButton id="button1" className="button" onClick={() => console.log("clicked")}>
+        <HLayout>
+            <UIPanel>
+                Button
+                <HLayout>
+                    <UIButton id="button1" className="button" onClick={() => console.log("clicked")}>
+                        Label
+                    </UIButton>
+                    <UIButton id="button2" className="button" onClick={() => console.log("clicked")}>
+                        With Icon
+                        <UIIcon id="icon1" className="icon" src="./favicon.ico" />
+                    </UIButton>
+                </HLayout>
+            </UIPanel>
+            <UIPanel>
                 Label
-            </UIButton>
-            <UIButton id="button2" className="button" onClick={() => console.log("clicked")}>
-                With Icon
-                <UIIcon id="icon1" className="icon" src="./favicon.ico" />
-            </UIButton>
-        </UIPanel>
-        <UIPanel>
-            Checkbox
-            <HLayout hAlign="left">
-                <UICheckbox id="checkbox1" className="checkbox" isChecked={true} onChange={onChange} />
-                <UICheckbox className="checkbox" position="before" label="Label before" onChange={onChange} />
-                <UICheckbox position="after" label="Label after" onChange={onChange} />
-            </HLayout>
-        </UIPanel>
-        <UIPanel>
-            Radio
-            <HLayout hAlign="left">
-                <UIRadioButton id="radio1" className="radio" isChecked={false} onChange={onChange} />
-                <UIRadioButton className="radio" position="before" label="Label before" onChange={onChange} />
-                <UIRadioButton position="after" label="Label after" onChange={onChange} />
-            </HLayout>
-        </UIPanel>
-        <UIPanel>
-            Label
-            <UILabel id="label1" className="label" text="A Label" />
-            <UILabel className="label" text="Label after icon"><UIIcon src="./favicon.ico" /></UILabel>
-            <UILabel text="Label before icon" position="before"><UIIcon src="./favicon.ico" /></UILabel>
-        </UIPanel>
-        <UIPanel>
-            InputGroup
-            <UILabel text="RadioButton" />
-            <UIInputGroup id="inputGroup1" className="inputGroup" onChange={(name: string) => console.log({ name })}>
-                <UIRadioButton name="a" label="a" />
-                <UIRadioButton name="b" label="b" />
-                <UIRadioButton name="c" label="c" />
-            </UIInputGroup>
-        </UIPanel>
+                <UILabel id="label1" className="label" text="A Label" />
+                <UILabel className="label" text="Label after icon"><UIIcon src="./favicon.ico" /></UILabel>
+                <UILabel text="Label before icon" position="before"><UIIcon src="./favicon.ico" /></UILabel>
+            </UIPanel>
+        </HLayout>
+        <HLayout>
+            <UIPanel>
+                Checkbox
+                <VLayout hAlign="left">
+                    <UICheckbox id="checkbox1" className="checkbox" isChecked={true} onChange={onChange} />
+                    <UICheckbox className="checkbox" position="before" label="Label before" onChange={onChange} />
+                    <UICheckbox position="after" label="Label after" onChange={onChange} />
+                </VLayout>
+            </UIPanel>
+            <UIPanel>
+                Radio
+                <VLayout hAlign="left">
+                    <UIRadioButton id="radio1" className="radio" isChecked={true} onChange={onChange} />
+                    <UIRadioButton className="radio" position="before" label="Label before" onChange={onChange} />
+                    <UIRadioButton position="after" label="Label after" onChange={onChange} />
+                </VLayout>
+            </UIPanel>
+        </HLayout>
+        <HLayout>
+            <UIPanel>
+                InputGroup
+                <UILabel text="RadioButton" />
+                <UIInputGroup id="inputGroup1" className="inputGroup" onChange={(name: string) => console.log({ name })}>
+                    <UIRadioButton name="a" label="a" />
+                    <UIRadioButton name="b" label="b" />
+                    <UIRadioButton name="c" label="c" />
+                </UIInputGroup>
+            </UIPanel>
+            <UIPanel>
+                InputGroup
+                <UILabel text="Button" />
+                <UIInputGroup id="inputGroup2" className="inputGroup" direction="horizontal" onChange={(name: string) => console.log({ name })}>
+                    <UIButton name="a">a</UIButton>
+                    <UIButton name="b">b</UIButton>
+                    <UIButton name="c">c</UIButton>
+                </UIInputGroup>
+            </UIPanel>
+        </HLayout>
     </div>
 ), document.getElementById('main'));
