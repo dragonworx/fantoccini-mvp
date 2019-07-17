@@ -1,16 +1,18 @@
+@size: 14px;
+
 .ui-radio {
-    width: 16px;
-    height: 16px;
+    width: @size;
+    height: @size;
     font-weight: bold;
     position: relative;
 }
 
 .ui-radio .radio {
     position: absolute;
-    top: 6px;
-    left: 6px;
+    top: 5px;
+    left: 5px;
     background: linear-gradient(0deg, #494949 0, #ffffff 100%);
-    width: 14px;
-    height: 14px;
+    width: @size + 2;
+    height: @size + 2;
     border-radius: 10px;
 }
