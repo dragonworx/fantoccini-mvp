@@ -1,9 +1,10 @@
+import '../../less/InputGroup';
 import * as React from 'react';
 import { Component, ReactElement } from 'react';
-import { HLayout, VLayout, UIGridAlignProps } from './grid';
-import { HTMLElementProps, UIInputGroupItemProps, cloneChildren } from './util';
+import { HLayout, VLayout, GridAlignProps } from './Grid';
+import { HTMLElementProps, InputGroupItemProps, cloneChildren } from './util';
 
-export interface Props extends HTMLElementProps, UIGridAlignProps {
+export interface Props extends HTMLElementProps, GridAlignProps {
     selected?: string;
     direction: 'vertical' | 'horizontal';
     onChange?: (name: string) => void;
@@ -13,7 +14,7 @@ export interface State {
     selected?: string;
 }
 
-export class UIInputGroup extends Component<Props, State> {
+export class InputGroup extends Component<Props, State> {
     state: State = {
         selected: this.props.selected,
     };
@@ -34,11 +35,11 @@ export class UIInputGroup extends Component<Props, State> {
     render() {
         const { selected } = this.state;
         const { direction, id, className, hAlign, vAlign } = this.props;
-        const children = cloneChildren(this.props.children, (child: ReactElement<UIInputGroupItemProps>) => ({
+        const children = cloneChildren(this.props.children, (child: ReactElement<InputGroupItemProps>) => ({
             onChange: this.onChange,
             isGroupSelected: selected === child.props.name,
         }));
         const Layout = direction === 'vertical' ? VLayout : HLayout;
-        return <Layout id={id} className={`ui-input-group ${className || ''}`} hAlign={hAlign} vAlign={vAlign}>{children}</Layout>;
+        return <Layout id={id} className={`input-group ${className || ''}`} hAlign={hAlign} vAlign={vAlign}>{children}</Layout>;
     }
 }

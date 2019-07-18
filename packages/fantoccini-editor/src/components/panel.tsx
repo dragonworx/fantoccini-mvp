@@ -1,14 +1,19 @@
+import '../../less/Panel';
 import * as React from 'react';
 import { Component } from 'react';
 import { HTMLElementProps } from './util';
-import "../../less/ui-panel.less";
 
-export class UIPanel extends Component<HTMLElementProps, {}> {
+export interface Props extends HTMLElementProps {
+    title?: string;
+}
+
+export class Panel extends Component<Props, {}> {
     render() {
-        const { id, className } = this.props;
+        const { id, className, title: label } = this.props;
         return (
-            <div id={id} className={`ui-panel ${className || ''}`.trim()}>
-                <div className="ui-panel-content">
+            <div id={id} className={`panel ${className || ''}`.trim()}>
+                <div className="panel-content">
+                    {label ? <div className="panel-label">{label}</div> : null}
                     {this.props.children}
                 </div>
             </div>

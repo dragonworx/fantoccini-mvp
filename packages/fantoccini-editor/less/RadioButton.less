@@ -1,19 +1,21 @@
-@size: 14px;
+@width: 13px;
+@height: 20px;
 
-.ui-radio {
-    width: @size;
-    height: @size;
+.radio {
+    width: @width;
+    height: @height;
     font-weight: bold;
     position: relative;
     border-radius: 20px;
+    flex-grow: unset;
 }
 
-.ui-radio .radio {
+.radio .radio {
     position: absolute;
     top: 5px;
     left: 5px;
     background: linear-gradient(0deg, #2b4e6b 0, #ffffff 100%);
-    width: @size + 2;
-    height: @size + 2;
+    width: @width + 2;
+    height: @height - 4;
     border-radius: 10px;
 }

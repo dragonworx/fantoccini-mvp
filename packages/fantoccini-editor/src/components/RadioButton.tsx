@@ -1,10 +1,10 @@
+import '../../less/RadioButton';
 import * as React from 'react';
-import { UIButton } from './button';
-import { UICheckbox } from './checkbox';
-import { UILabel } from './label';
-import '../../less/ui-radio.less';
+import { Button } from './Button';
+import { Checkbox } from './Checkbox';
+import { Label } from './Label';
 
-export class UIRadioButton extends UICheckbox {
+export class RadioButton extends Checkbox {
     onClick = () => {
         if (this.state.checked) {
             return;
@@ -19,20 +19,18 @@ export class UIRadioButton extends UICheckbox {
         const { label, id, className, isGroupSelected, position } = this.props;
         const isChecked = isGroupSelected === true ? true : checked;
         const content = (
-            <UIButton 
+            <Button 
                 id={id}
-                className={`ui-checkbox ui-radio ${className || ''}`.trim()}
+                className={`checkbox radio ${className || ''}`.trim()}
                 onClick={this.onClick}
                 toggled={isChecked}
             >
                 {isChecked ? <span className="radio"></span> : <span>&nbsp;</span>}
-            </UIButton>
+            </Button>
         );
         if (label) {
             return (
-                <span className="ui-checkbox-container">
-                    <UILabel position={position} text={label}>{content}</UILabel>
-                </span>
+                <Label position={position} text={label}>{content}</Label>
             )
         }
         return content;

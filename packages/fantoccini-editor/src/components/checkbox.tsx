@@ -1,11 +1,11 @@
+import '../../less/Checkbox';
 import * as React from 'react';
 import { Component } from 'react';
-import { UIButton } from './button';
-import { UILabel } from './label';
-import { HTMLElementProps, UIInputGroupItemProps } from './util';
-import '../../less/ui-checkbox.less';
+import { Button } from './button';
+import { Label } from './Label';
+import { HTMLElementProps, InputGroupItemProps } from './util';
 
-export interface Props extends HTMLElementProps, UIInputGroupItemProps {
+export interface Props extends HTMLElementProps, InputGroupItemProps {
     label?: string;
     position?: 'before' | 'after';
 }
@@ -18,7 +18,7 @@ export interface State {
     checked: boolean,
 }
 
-export class UICheckbox extends Component<Props, State> {
+export class Checkbox extends Component<Props, State> {
     state = {
         checked: this.props.isChecked,
     };
@@ -34,20 +34,17 @@ export class UICheckbox extends Component<Props, State> {
         const { checked } = this.state;
         const { label, id, className, position } = this.props;
         const content = (
-            <UIButton 
+            <Button 
                 id={id}
-                className={`ui-checkbox ${className || ''}`.trim()}
+                className={`checkbox ${className || ''}`.trim()}
                 onClick={this.onClick}
                 toggled={checked}
-            >
-                {checked ? <span>x</span> : <span>&nbsp;</span>}
-            </UIButton>
+                text={checked ? 'x' : ' '}
+            />
         );
         if (label) {
             return (
-                <span className="ui-checkbox-container">
-                    <UILabel text={label} position={position}>{content}</UILabel>
-                </span>
+                <Label text={label} position={position}>{content}</Label>
             )
         }
         return content;

@@ -1,76 +1,77 @@
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-import { UIButton } from './fantoccini-editor/src/components/button';
-import { UIIcon } from './fantoccini-editor/src/components/icon';
-import { UICheckbox } from './fantoccini-editor/src/components/checkbox';
-import { UIRadioButton } from './fantoccini-editor/src/components/radio';
-import { UIGrid, UIGridRow, UIGridCell, HLayout, VLayout } from './fantoccini-editor/src/components/grid';
-import { UIPanel } from './fantoccini-editor/src/components/panel';
-import { UILabel } from './fantoccini-editor/src/components/label';
-import { UIInputGroup } from './fantoccini-editor/src/components/inputGroup';
-import './fantoccini-editor/less/main.less';
+import { Button } from './fantoccini-editor/src/components/Button';
+import { Icon } from './fantoccini-editor/src/components/Icon';
+import { Checkbox } from './fantoccini-editor/src/components/Checkbox';
+import { RadioButton } from './fantoccini-editor/src/components/RadioButton';
+import { HLayout, VLayout } from './fantoccini-editor/src/components/Grid';
+import { Panel } from './fantoccini-editor/src/components/Panel';
+import { Label } from './fantoccini-editor/src/components/Label';
+import { InputGroup } from './fantoccini-editor/src/components/InputGroup';
+import { TextInput, NumericSpinner } from './fantoccini-editor/src/components/TextInput';
+import './fantoccini-editor/less/_main';
 
-const onChange = (isChecked: boolean) => console.log({ isChecked });
+const onClick = () => console.log('clicked');
+const onCheckChanged = (isChecked: boolean) => console.log({ isChecked });
+const onTextChanged = (text: string) => console.log('change', { text });
+const onTextAccept = (text: string) => console.log('accept', { text });
+const onKeyDown = (text: string, keyCode: number) => console.log('keydown', { text, keyCode });
+const onKeyUp = (text: string, keyCode: number) => console.log('keyup', { text, keyCode });
+
+const icon = <Icon id="icon1" className="custom-icon" src="./favicon.ico" />;
 
 ReactDOM.render((
     <div id="example">
         <HLayout>
-            <UIPanel>
-                Button
+            <Panel title="Button">
                 <HLayout>
-                    <UIButton id="button1" className="button" onClick={() => console.log("clicked")}>
-                        Label
-                    </UIButton>
-                    <UIButton id="button2" className="button" onClick={() => console.log("clicked")}>
-                        With Icon
-                        <UIIcon id="icon1" className="icon" src="./favicon.ico" />
-                    </UIButton>
+                    <Button id="button1" className="custom-button" onClick={onClick} text="Label" />
+                    <Button id="button2" className="custom-button" onClick={onClick} text="With Icon" icon={icon} />
                 </HLayout>
-            </UIPanel>
-            <UIPanel>
-                Label
-                <UILabel id="label1" className="label" text="A Label" />
-                <UILabel className="label" text="Label after icon"><UIIcon src="./favicon.ico" /></UILabel>
-                <UILabel text="Label before icon" position="before"><UIIcon src="./favicon.ico" /></UILabel>
-            </UIPanel>
+            </Panel>
+            <Panel title="Label">
+                <Label id="label1" className="custom-label" text="A Label" />
+                <Label className="custom-label" text="Label after icon" position="after"><Icon src="./favicon.ico" /></Label>
+                <Label text="Label before icon"><Icon src="./favicon.ico" /></Label>
+            </Panel>
         </HLayout>
         <HLayout>
-            <UIPanel>
-                Checkbox
+            <Panel title="Checkbox">
                 <VLayout hAlign="left">
-                    <UICheckbox id="checkbox1" className="checkbox" isChecked={true} onChange={onChange} />
-                    <UICheckbox className="checkbox" position="before" label="Label before" onChange={onChange} />
-                    <UICheckbox position="after" label="Label after" onChange={onChange} />
+                    <Checkbox id="checkbox1" className="custom-checkbox" isChecked={true} onChange={onCheckChanged} />
+                    <Checkbox className="custom-checkbox" label="Label before" onChange={onCheckChanged} />
+                    <Checkbox position="after" label="Label after" onChange={onCheckChanged} />
                 </VLayout>
-            </UIPanel>
-            <UIPanel>
-                Radio
+            </Panel>
+            <Panel title="Radio">
                 <VLayout hAlign="left">
-                    <UIRadioButton id="radio1" className="radio" isChecked={true} onChange={onChange} />
-                    <UIRadioButton className="radio" position="before" label="Label before" onChange={onChange} />
-                    <UIRadioButton position="after" label="Label after" onChange={onChange} />
+                    <RadioButton id="radio1" className="custom-radio" isChecked={true} onChange={onCheckChanged} />
+                    <RadioButton className="custom-radio" label="Label before" onChange={onCheckChanged} />
+                    <RadioButton position="after" label="Label after" onChange={onCheckChanged} />
                 </VLayout>
-            </UIPanel>
+            </Panel>
+            <Panel title="InputGroup">
+                <Label text="RadioButton" />
+                <InputGroup id="inputGroup1" className="custom-input-group" onChange={(name: string) => console.log({ name })}>
+                    <RadioButton name="a" label="a" position="after" />
+                    <RadioButton name="b" label="b" position="after" />
+                    <RadioButton name="c" label="c" position="after" />
+                </InputGroup>
+            </Panel>
+            <Panel title="InputGroup">
+                <Label text="Button" />
+                <InputGroup id="inputGroup2" className="custom-input-Group" direction="horizontal" onChange={(name: string) => console.log({ name })}>
+                    <Button text="a" name="a" />
+                    <Button text="b" name="b" />
+                    <Button text="c" name="c" icon={<Icon src="img/logo.png" />} />
+                </InputGroup>
+            </Panel>
         </HLayout>
-        <HLayout>
-            <UIPanel>
-                InputGroup
-                <UILabel text="RadioButton" />
-                <UIInputGroup id="inputGroup1" className="inputGroup" onChange={(name: string) => console.log({ name })}>
-                    <UIRadioButton name="a" label="a" />
-                    <UIRadioButton name="b" label="b" />
-                    <UIRadioButton name="c" label="c" />
-                </UIInputGroup>
-            </UIPanel>
-            <UIPanel>
-                InputGroup
-                <UILabel text="Button" />
-                <UIInputGroup id="inputGroup2" className="inputGroup" direction="horizontal" onChange={(name: string) => console.log({ name })}>
-                    <UIButton name="a">a</UIButton>
-                    <UIButton name="b">b</UIButton>
-                    <UIButton name="c">c</UIButton>
-                </UIInputGroup>
-            </UIPanel>
-        </HLayout>
+        <Panel id="textpanel" title="TextInput">
+            <Label text="Basic"><TextInput onChange={onTextChanged} onAccept={onTextAccept} onKeyDown={onKeyDown} onKeyUp={onKeyUp}  /></Label>
+            <Label text="With Text"><TextInput text="text" onChange={onTextChanged} onAccept={onTextAccept} /></Label>
+            <Label text="Delay onChange 1sec"><TextInput delayMs={1000} onChange={onTextChanged} onAccept={onTextAccept} /></Label>
+            {/* <NumericSpinner id="numericspinner1" className="custom-numericspinner" /> */}
+        </Panel>
     </div>
 ), document.getElementById('main'));

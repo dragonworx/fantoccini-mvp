@@ -1,7 +1,9 @@
+import '../../less/Button';
 import * as React from 'react';
-import { Component } from 'react';
-import { HTMLElementProps, UIInputGroupItemProps } from './util';
-import '../../less/ui-button.less';
+import { Component, ReactElement } from 'react';
+import { HTMLElementProps, InputGroupItemProps } from './util';
+import { Props as IconProps, Icon } from './Icon';
+import { Label } from './Label';
 
 export enum UIButtonState {
     default,
@@ -17,8 +19,10 @@ export interface EventProps {
     onClick?: () => void;
 }
 
-export interface Props extends EventProps, HTMLElementProps, UIInputGroupItemProps {
+export interface Props extends EventProps, HTMLElementProps, InputGroupItemProps {
     toggled: boolean;
+    text?: string;
+    icon?: ReactElement<IconProps>;
 };
 
 export const defaultProps: Partial<Props> = {
@@ -29,7 +33,7 @@ export interface State {
     state: UIButtonState;
 }
 
-export class UIButton extends Component<Props, State> {
+export class Button extends Component<Props, State> {
     state = {
         state: UIButtonState.default,
     }
@@ -52,17 +56,20 @@ export class UIButton extends Component<Props, State> {
 
     renderButtonWithClass(cssClass: string) {
         const { state } = this.state;
-        const { className, toggled, id } = this.props;
+        const { className, toggled, id, text, icon, children } = this.props;
         return (
             <button
                 id={id}
-                className={`ui-button ui-button-${cssClass} ${className || ''} ${state !== UIButtonState.rollover && toggled ? 'ui-button-toggled' : ''}`.trim()}
+                className={`button button-${cssClass} ${className || ''} ${state !== UIButtonState.rollover && toggled ? 'button-toggled' : ''}`.trim()}
                 onMouseOver={this.onMouseOver}
                 onMouseOut={this.onMouseOut}
                 onMouseDown={this.onMouseDown}
                 onMouseUp={this.onMouseUp}
                 onClick={this.onClick}
-            >{this.props.children}</button>
+            >
+                <Label text={text}>{icon ? icon : null}</Label>
+                { children }
+            </button>
         );
     }
 

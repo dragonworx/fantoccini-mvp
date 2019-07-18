@@ -1,71 +1,71 @@
+import '../../less/Grid';
 import * as React from 'react';
 import { Component, ReactElement } from 'react';
 import { cloneChildren, HTMLElementProps } from './util';
-import "../../less/ui-grid";
 
-export interface UIGridAlignProps extends HTMLElementProps {
+export interface GridAlignProps extends HTMLElementProps {
     hAlign?: 'left' | 'center' | 'right';
     vAlign?: 'top' | 'center' | 'bottom';
 }
 
-export class UIGridElement extends Component<UIGridAlignProps, {}> {
+export class GridElement extends Component<GridAlignProps, {}> {
     cloneChildrenWithProps() {
         const { hAlign, vAlign } = this.props;
-        return cloneChildren(this.props.children, (child: ReactElement<UIGridAlignProps>) => ({
+        return cloneChildren(this.props.children, (child: ReactElement<GridAlignProps>) => ({
             hAlign: hAlign || child.props.hAlign,
             vAlign: vAlign || child.props.vAlign,
         }));
     }
 }
 
-export class UIGrid extends UIGridElement {
+export class Grid extends GridElement {
     render() {
         const { id, className } = this.props;
-        return <div id={id} className={`ui-grid ${className || ''}`.trim()}>{this.cloneChildrenWithProps()}</div>
+        return <div id={id} className={`grid ${className || ''}`.trim()}>{this.cloneChildrenWithProps()}</div>
     }
 }
 
-export class UIGridRow extends UIGridElement {
+export class GridRow extends GridElement {
     render() {
         const { id, className } = this.props;
-        return <div id={id} className={`ui-grid-row ${className || ''}`.trim()}>{this.cloneChildrenWithProps()}</div>
+        return <div id={id} className={`grid-row ${className || ''}`.trim()}>{this.cloneChildrenWithProps()}</div>
     }
 }
 
-export class UIGridCell extends UIGridElement {
+export class GridCell extends GridElement {
     render() {
         const { hAlign, vAlign, id, className } = this.props;
-        const hClassName = hAlign ? 'ui-grid-cell-h-' + hAlign : '';
-        const vClassName = vAlign ? 'ui-grid-cell-v-' + vAlign : '';
-        const cssName = `ui-grid-cell ${hClassName} ${vClassName} ${className || ''}`.trim();
+        const hClassName = hAlign ? 'grid-cell-h-' + hAlign : '';
+        const vClassName = vAlign ? 'grid-cell-v-' + vAlign : '';
+        const cssName = `grid-cell ${hClassName} ${vClassName} ${className || ''}`.trim();
         return <div id={id} className={cssName}>{this.props.children}</div>
     }
 }
 
-export class HLayout extends UIGridElement {
+export class HLayout extends GridElement {
     render() {
         const { children, id, className, hAlign, vAlign} = this.props;
-        const childs = React.Children.map(children, (child: ReactElement) => <UIGridCell>{child}</UIGridCell>) || [];
+        const childs = React.Children.map(children, (child: ReactElement) => <GridCell>{child}</GridCell>) || [];
         return (
-            <UIGrid id={id} className={`ui-h-layout ${className || ''}`}>
+            <Grid id={id} className={`h-layout ${className || ''}`}>
                 {childs.length ? (
-                    <UIGridRow hAlign={hAlign} vAlign={vAlign}>
+                    <GridRow hAlign={hAlign} vAlign={vAlign}>
                         {childs}
-                    </UIGridRow>
+                    </GridRow>
                 ) : null}
-            </UIGrid>
+            </Grid>
         )
     }
 }
 
-export class VLayout extends UIGridElement {
+export class VLayout extends GridElement {
     render() {
         const { children, id, className, hAlign, vAlign} = this.props;
-        const childs = React.Children.map(children, (child: ReactElement) => <UIGridRow hAlign={hAlign} vAlign={vAlign}><UIGridCell>{child}</UIGridCell></UIGridRow>) || [];
+        const childs = React.Children.map(children, (child: ReactElement) => <GridRow hAlign={hAlign} vAlign={vAlign}><GridCell>{child}</GridCell></GridRow>) || [];
         return (
-            <UIGrid id={id} className={`ui-v-layout ${className || ''}`}>
+            <Grid id={id} className={`v-layout ${className || ''}`}>
                 {childs.length ? childs : null}
-            </UIGrid>
+            </Grid>
         )
     }
 }
