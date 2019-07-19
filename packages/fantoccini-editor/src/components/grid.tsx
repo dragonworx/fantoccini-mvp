@@ -69,3 +69,10 @@ export class VLayout extends GridElement {
         )
     }
 }
+
+export class Block extends Component<HTMLElementProps, {}> {
+    render() {
+        const { id, className, children } = this.props;
+        return <div  id={id} className={`block ${className || ''}`}>{children}</div>
+    }
+}

@@ -8,7 +8,7 @@ import { HLayout, VLayout } from './fantoccini-editor/src/components/Grid';
 import { Panel } from './fantoccini-editor/src/components/Panel';
 import { Label } from './fantoccini-editor/src/components/Label';
 import { InputGroup } from './fantoccini-editor/src/components/InputGroup';
-import { TextInput, NumericSpinner } from './fantoccini-editor/src/components/TextInput';
+import { TextField, NumericSpinnerField } from './fantoccini-editor/src/components/TextInput';
 import './fantoccini-editor/less/_main';
 
 const onClick = () => console.log('clicked');
@@ -34,8 +34,6 @@ ReactDOM.render((
                 <Label className="custom-label" text="Label after icon" position="after"><Icon src="./favicon.ico" /></Label>
                 <Label text="Label before icon"><Icon src="./favicon.ico" /></Label>
             </Panel>
-        </HLayout>
-        <HLayout>
             <Panel title="Checkbox">
                 <VLayout hAlign="left">
                     <Checkbox id="checkbox1" className="custom-checkbox" isChecked={true} onChange={onCheckChanged} />
@@ -50,6 +48,8 @@ ReactDOM.render((
                     <RadioButton position="after" label="Label after" onChange={onCheckChanged} />
                 </VLayout>
             </Panel>
+        </HLayout>
+        <HLayout>
             <Panel title="InputGroup">
                 <Label text="RadioButton" />
                 <InputGroup id="inputGroup1" className="custom-input-group" onChange={(name: string) => console.log({ name })}>
@@ -66,12 +66,12 @@ ReactDOM.render((
                     <Button text="c" name="c" icon={<Icon src="img/logo.png" />} />
                 </InputGroup>
             </Panel>
+            <Panel id="textpanel" title="TextInput">
+                <TextField label="Basic" onChange={onTextChanged} onAccept={onTextAccept} onKeyDown={onKeyDown} onKeyUp={onKeyUp} />
+                <TextField label="With Text" text="text" onChange={onTextChanged} onAccept={onTextAccept} />
+                <TextField label="Delay onChange 1sec" delayMs={1000} onChange={onTextChanged} onAccept={onTextAccept} />
+                <NumericSpinnerField label="Basic" />
+            </Panel>
         </HLayout>
-        <Panel id="textpanel" title="TextInput">
-            <Label text="Basic"><TextInput onChange={onTextChanged} onAccept={onTextAccept} onKeyDown={onKeyDown} onKeyUp={onKeyUp}  /></Label>
-            <Label text="With Text"><TextInput text="text" onChange={onTextChanged} onAccept={onTextAccept} /></Label>
-            <Label text="Delay onChange 1sec"><TextInput delayMs={1000} onChange={onTextChanged} onAccept={onTextAccept} /></Label>
-            {/* <NumericSpinner id="numericspinner1" className="custom-numericspinner" /> */}
-        </Panel>
     </div>
 ), document.getElementById('main'));

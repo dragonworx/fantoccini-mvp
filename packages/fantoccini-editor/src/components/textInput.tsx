@@ -2,21 +2,26 @@ import '../../less/TextInput';
 import * as React from 'react';
 import { Component, SyntheticEvent, KeyboardEvent } from 'react';
 import { HTMLElementProps, blur } from './util';
+import { Label } from './Label';
+import { Block } from './grid';
 
-export interface Props extends HTMLElementProps {
-    text?: string;
-    delayMs?: number;
+export interface KeyEventProps {
     onKeyDown?: (text: string, keyCode: number) => void;
     onKeyUp?: (text: string, keyCode: number) => void;
     onChange?: (text: string) => void;
     onAccept?: (text: string) => void;
 }
 
-export interface State {
+export interface TextInputProps extends HTMLElementProps, KeyEventProps {
+    text?: string;
+    delayMs?: number;
+}
+
+export interface TextInputState {
     text: string;
 }
 
-export class TextInput extends Component<Props, State> {
+export class TextInput extends Component<TextInputProps, TextInputState> {
     timeoutId?: number;
 
     state = {
@@ -81,10 +86,38 @@ export class TextInput extends Component<Props, State> {
         />;
     }
 
-    componentDidUpdate(prevProps: Props) {
-        console.log("!", prevProps);
+    componentDidUpdate(prevProps: TextInputProps) {
+        if (prevProps.text !== this.props.text) {
+            this.setState({ text: this.props.text });
+        }
     }
 }
+
+/* TextField */
+
+export interface FieldProps {
+    label: string;
+    position?: 'before' | 'after',
+}
+
+export interface TextFieldProps extends KeyEventProps, TextInputProps, FieldProps {
+
+}
+
+export class TextField extends Component<TextFieldProps, {}> {
+    render() {
+        const { id, className, label, position, onChange, onAccept, onKeyDown, onKeyUp, text, delayMs } = this.props;
+        return (
+            <Block id={id} className={`text-field ${className || ''}`}>
+                <Label text={label} position={position}>
+                    <TextInput onChange={onChange} onAccept={onAccept} onKeyDown={onKeyDown} onKeyUp={onKeyUp} text={text} delayMs={delayMs} />
+                </Label>
+            </Block>
+        )
+    }
+}
+
+/* NumericSpinner */
 
 export interface NumericSpinnerProps extends HTMLElementProps {
     value: number;
@@ -106,6 +139,23 @@ export class NumericSpinner extends Component<NumericSpinnerProps, NumericSpinne
     render() {
         const { value } = this.state;
         const { id, className } = this.props;
-        return <p></p>;
+        return 'a';
+    }
+}
+
+export interface NumericSpinnerFieldProps extends FieldProps, HTMLElementProps {
+
+}
+
+export class NumericSpinnerField extends Component<NumericSpinnerFieldProps, {}> {
+    render() {
+        const { id, className, label, position } = this.props;
+        return (
+            <Block id={id} className={`text-field ${className || ''}`}>
+                <Label text={label} position={position}>
+                    <span>blag</span>
+                </Label>
+            </Block>
+        )
     }
 }
