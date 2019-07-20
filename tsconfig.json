@@ -9,6 +9,7 @@
         "jsx": "react",
         "paths": {
             "react-blit/*": [ "./react-blit/*" ],
+            "fantoccini-kit/*": [ "./fantoccini-kit/*" ],
         },
     },
     "include": [

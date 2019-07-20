@@ -1,10 +1,10 @@
-import '../../less/InputGroup';
+import '../less/InputGroup';
 import * as React from 'react';
 import { Component, ReactElement } from 'react';
 import { HLayout, VLayout, GridAlignProps } from './Grid';
-import { HTMLElementProps, InputGroupItemProps, cloneChildren } from './util';
+import { CssSelectableProps, InputGroupItemProps, cloneChildren } from 'fantoccini-kit';
 
-export interface Props extends HTMLElementProps, GridAlignProps {
+export interface Props extends CssSelectableProps, GridAlignProps {
     selected?: string;
     direction: 'vertical' | 'horizontal';
     onChange?: (name: string) => void;

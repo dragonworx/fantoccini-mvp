@@ -1,7 +1,8 @@
-import '../../less/Icon';
+import '../less/Icon';
 import * as React from 'react';
-import { Component } from 'react';
+import { Component, FunctionComponent as FC } from 'react';
 import { HTMLElementProps } from './util';
+import { Wrapper, img } from './elements'
 
 export interface Props extends HTMLElementProps {
     src: string;
@@ -25,3 +26,5 @@ export class Icon extends Component<Props, State> {
         
     }
 }
+
+export const Icon2: FC<Props> = (props: Props) => <Wrapper {...props} type={img} style={{ width: props.size }} />;

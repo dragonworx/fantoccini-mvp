@@ -1,3 +1,4 @@
+@import (reference) './variables';
 @import (reference) './common';
 
 * {
@@ -5,17 +6,15 @@
 }
 
 html, body {
-    .fill();
+    .expand-to-fill();
     overflow: hidden;
     background-color: rgb(85, 85, 85);
 }
 
 #main {
-    .fill();
+    .expand-to-fill();
+    padding: @padding;
     background-color: #333;
-    // background-color: rgb(147, 171, 215);
-    // @grid-url: "/img/grid.png";
-    // background-image: url("@{grid-url}");
     display: flex;
     flex-direction: column;
 }

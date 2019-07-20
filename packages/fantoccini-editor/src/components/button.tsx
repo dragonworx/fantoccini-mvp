@@ -1,4 +1,4 @@
-import '../../less/Button';
+import '../less/Button';
 import * as React from 'react';
 import { Component, ReactElement } from 'react';
 import { HTMLElementProps, InputGroupItemProps } from './util';

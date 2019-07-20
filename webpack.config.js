@@ -20,6 +20,7 @@ module.exports = (env) => {
             extensions: [".ts", ".tsx", ".js", ".json", ".less", ".css"],
             alias: {
                 'react-blit': path.resolve(__dirname, 'packages/react-blit/'),
+                'fantoccini-kit': path.resolve(__dirname, 'packages/fantoccini-kit'),
             }
         },
         module: {

@@ -1,9 +1,9 @@
-import '../../less/Label';
+import '../less/Label';
 import * as React from 'react';
 import { Component } from 'react';
-import { HTMLElementProps } from './util';
+import { CssSelectableProps } from 'fantoccini-kit';
 
-export interface Props extends HTMLElementProps {
+export interface Props extends CssSelectableProps {
     text: string;
     position?: 'before' | 'after';
 }

@@ -1,9 +1,9 @@
-import '../../less/Grid';
+import '../less/Grid';
 import * as React from 'react';
 import { Component, ReactElement } from 'react';
-import { cloneChildren, HTMLElementProps } from './util';
+import { cloneChildren, CssSelectableProps } from 'fantoccini-kit';
 
-export interface GridAlignProps extends HTMLElementProps {
+export interface GridAlignProps extends CssSelectableProps {
     hAlign?: 'left' | 'center' | 'right';
     vAlign?: 'top' | 'center' | 'bottom';
 }
@@ -70,7 +70,7 @@ export class VLayout extends GridElement {
     }
 }
 
-export class Block extends Component<HTMLElementProps, {}> {
+export class Block extends Component<CssSelectableProps, {}> {
     render() {
         const { id, className, children } = this.props;
         return <div  id={id} className={`block ${className || ''}`}>{children}</div>

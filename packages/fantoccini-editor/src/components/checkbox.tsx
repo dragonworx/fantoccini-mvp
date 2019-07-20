@@ -1,11 +1,11 @@
-import '../../less/Checkbox';
+import '../less/Checkbox';
 import * as React from 'react';
 import { Component } from 'react';
 import { Button } from './button';
 import { Label } from './Label';
-import { HTMLElementProps, InputGroupItemProps } from './util';
+import { CssSelectableProps, InputGroupItemProps } from 'fantoccini-kit';
 
-export interface Props extends HTMLElementProps, InputGroupItemProps {
+export interface Props extends CssSelectableProps, InputGroupItemProps {
     label?: string;
     position?: 'before' | 'after';
 }

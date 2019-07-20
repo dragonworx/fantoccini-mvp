@@ -1,7 +1,7 @@
-import '../../less/TextInput';
+import '../less/TextInput';
 import * as React from 'react';
 import { Component, SyntheticEvent, KeyboardEvent } from 'react';
-import { HTMLElementProps, blur } from './util';
+import { CssSelectableProps, blur } from 'fantoccini-kit';
 import { Label } from './Label';
 import { Block } from './grid';
 
@@ -12,7 +12,7 @@ export interface KeyEventProps {
     onAccept?: (text: string) => void;
 }
 
-export interface TextInputProps extends HTMLElementProps, KeyEventProps {
+export interface TextInputProps extends CssSelectableProps, KeyEventProps {
     text?: string;
     delayMs?: number;
 }
@@ -119,7 +119,7 @@ export class TextField extends Component<TextFieldProps, {}> {
 
 /* NumericSpinner */
 
-export interface NumericSpinnerProps extends HTMLElementProps {
+export interface NumericSpinnerProps extends CssSelectableProps {
     value: number;
 }
 
@@ -143,7 +143,7 @@ export class NumericSpinner extends Component<NumericSpinnerProps, NumericSpinne
     }
 }
 
-export interface NumericSpinnerFieldProps extends FieldProps, HTMLElementProps {
+export interface NumericSpinnerFieldProps extends FieldProps, CssSelectableProps {
 
 }
 

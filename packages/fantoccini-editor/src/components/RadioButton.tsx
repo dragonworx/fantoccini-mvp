@@ -1,4 +1,4 @@
-import '../../less/RadioButton';
+import '../less/RadioButton';
 import * as React from 'react';
 import { Button } from './Button';
 import { Checkbox } from './Checkbox';
