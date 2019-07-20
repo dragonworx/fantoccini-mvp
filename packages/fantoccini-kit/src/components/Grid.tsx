@@ -1,5 +1,4 @@
-import { React, Component, Props, table, tr, td } from './common'
-import { px } from '../util'
+import { React, Component, Props, px, css, table, tr, td, div } from './common'
 
 import '../less/Grid'
 
@@ -42,8 +41,8 @@ export const Cell = (props: CellProps) => {
     return (
         <Component el={td} css={[
             'cell', 
-            hAlign ? `cell-hAlign-${hAlign}` : undefined, 
-            vAlign ? `cell-vAlign-${vAlign}` : undefined,
+            css('cell-halign-$', hAlign),
+            css('cell-valign-$', vAlign),
         ]} {...props} attributes={{
             width,
         }}>
@@ -51,3 +50,6 @@ export const Cell = (props: CellProps) => {
         </Component>
     );
 }
+
+export const HLayout = (props: Props) => <Component el={div} css="hlayout" {...props}>{props.children}</Component>
+export const VLayout = (props: Props) => <Component el={div} css="vlayout" {...props}>{props.children}</Component>

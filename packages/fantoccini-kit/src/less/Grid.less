@@ -1,3 +1,23 @@
-.grid, .grid * {
-    border: 1px solid white;
+.fantoccini-kit {
+    .grid {
+        * {
+            border: 1px solid white;
+        }
+    }
+
+    .hlayout, .vlayout {
+        display: flex;
+
+        > * {
+            flex-grow: 1;
+        }
+    }
+
+    .hlayout {
+        flex-direction: row;
+    }
+
+    .vlayout {
+        flex-direction: column;
+    }
 }

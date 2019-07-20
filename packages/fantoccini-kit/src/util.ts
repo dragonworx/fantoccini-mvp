@@ -35,3 +35,7 @@ export function blur() {
 export function px(num: number): string | undefined {
     return num === undefined ? undefined : `${num}px`;
 }
+
+export function css(str: string, value: any) {
+    return value ? str.replace('$', value) : undefined;
+}

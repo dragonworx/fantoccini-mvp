@@ -1,4 +1,4 @@
-import { React, Component, Props, img } from './common'
+import { React, Component, Props, px, img } from './common'
 
 import '../less/Icon'
 
@@ -9,5 +9,5 @@ export interface IconProps extends Props {
 
 export const Icon = (props: IconProps) => {
     const { size = 32 } = props;
-    return <Component el={img} css="icon" style={{ width: size }} {...props} />;
+    return <Component el={img} css="icon" attributes={{ width: px(size) }} {...props} />;
 }

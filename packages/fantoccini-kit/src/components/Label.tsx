@@ -1,4 +1,4 @@
-import { React, Component, Props, label } from './common'
+import { React, Component, Props, css, label } from './common'
 
 import '../less/Label'
 
@@ -9,7 +9,7 @@ export interface LabelProps extends Props {
 
 export const Label = (props: LabelProps) => {
     const { children, text, position = 'before' } = props;
-    return <Component el={label} css={['label', `label-${position}`]} {...props}>{
+    return <Component el={label} css={['label', css('label-$', position)]} {...props}>{
         position === 'before'
             ? (
                 <>
