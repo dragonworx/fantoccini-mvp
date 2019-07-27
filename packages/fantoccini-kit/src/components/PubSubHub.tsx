@@ -42,6 +42,10 @@ class EventQueue {
         });
         this.events.length = 0;
     }
+
+    clear(name: string) {
+        this.hub.clear(name);
+    }
 }
 
 type QueueRefCallback = (queue: EventQueue) => void;
@@ -95,7 +99,7 @@ const HubContext = (props: HubContextProps) => {
 }
 
 type Pattern = string | RegExp;
-type Handler = (event: Event) => boolean | void;
+type Handler = (event?: Event | null) => void;
 
 interface HubListener {
     pattern: Pattern;
@@ -119,16 +123,24 @@ class Hub {
         } else {
             event = eventOrName;
         }
-        console.log('Emit!', event)
+        console.log('Hub.emit()', event)
         const { listeners } = this;
         const l = listeners.length;
         for (let i = 0; i < l; i++) {
             const listener = listeners[i];
             if (event.name.match(listener.pattern)) {
-                const result = listener.handler(event);
-                if (result === true) {
-                    return;
-                }
+                listener.handler(event);
+            }
+        }
+    }
+
+    clear(name: string) {
+        const { listeners } = this;
+        const l = listeners.length;
+        for (let i = 0; i < l; i++) {
+            const listener = listeners[i];
+            if (name.match(listener.pattern)) {
+                listener.handler(null);
             }
         }
     }
@@ -166,6 +178,49 @@ const Sub = (props: SubProps) => {
     )
 }
 
+interface SendProps {
+    name: string;
+    args?: any[];
+    delayMs?: number;
+}
+
+const Send = (props: SendProps) => {
+    return (
+        <PubSubContext.Consumer>
+        {
+            ({hub}) => {
+                const { name, args = [], delayMs = -1 } = props;
+                const event = new Event(name, args);
+                if (typeof delayMs === 'number' && delayMs > -1) {
+                    setTimeout(() => hub.emit(event), delayMs);
+                } else {
+                    hub.emit(event);
+                }
+                return null;
+            }
+        }
+        </PubSubContext.Consumer>
+    )
+}
+
+const Clear = (props: SendProps) => {
+    return (
+        <PubSubContext.Consumer>
+        {
+            ({hub}) => {
+                const { name, args = [], delayMs = -1 } = props;
+                if (typeof delayMs === 'number' && delayMs > -1) {
+                    setTimeout(() => hub.clear(name), delayMs);
+                } else {
+                    hub.clear(name);
+                }
+                return null;
+            }
+        }
+        </PubSubContext.Consumer>
+    )
+}
+
 export {
     Pub,
     Sub,
@@ -173,4 +228,6 @@ export {
     HubContext,
     Hub,
     EventQueue,
+    Send,
+    Clear,
 }
