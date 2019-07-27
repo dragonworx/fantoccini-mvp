@@ -1,6 +1,6 @@
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-import { Pub, Sub, Hub, HubController, Send, Clear } from 'react-pubsubhub';
+import { Access, Read, State, StateStore, Set } from 'react-pubsubhub';
 import { CSSTransition } from 'react-transition-group';
 
 import 'fantoccini-kit/src/less/react-pubsubhub-demo';
@@ -40,31 +40,39 @@ import 'fantoccini-kit/src/less/react-pubsubhub-demo';
 //     ), document.getElementById('main'));
 // };
 
-const dialog_open = 'dialog.open';
+const dialog_is_open = 'dialog.is.open';
 
-const onOpenDialogButtonClick = (hub: HubController) => () => hub.emit(dialog_open);
-const onCloseDialogButtonClick = (hub: HubController) => () => hub.clear(dialog_open);
+const onOpenDialogButtonClick = (state: StateStore) => () => state.set(dialog_is_open, true);
+const onCloseDialogButtonClick = (state: StateStore) => () => state.set(dialog_is_open, false);
+
+interface Props {
+    isOpen: boolean;
+}
+
+const Dialog = ({isOpen}: Props) => {
+    return (
+        <CSSTransition in={isOpen} timeout={1000} classNames="dialog" appear={isOpen}>
+            <div className="dialog-blanket">
+                <div className="dialog-container">
+                    Dialog!
+                    <Access>
+                        { state => <button onClick={onCloseDialogButtonClick(state)}>Close</button>}
+                    </Access>
+                </div>
+            </div>
+        </CSSTransition>
+    );
+};
 
 ReactDOM.render((
-    <Hub>
-        <Pub>
-            { hub => <button onClick={onOpenDialogButtonClick(hub)}>Open Dialog</button> }
-        </Pub>
-            <Sub on={dialog_open}>
-                {
-                    (event) => (
-                        <CSSTransition in={true} timeout={1000} classNames="dialog" appear={true}>
-                        <div className="dialog-blanket">
-                            <div className="dialog-container">
-                                Dialog!
-                                <button onClick={onCloseDialogButtonClick(event.hub)}>Close</button>
-                            </div>
-                        </div>
-                        </CSSTransition>
-                    )
-                }
-            </Sub>
-    </Hub> 
+    <State>
+        <Access>
+            { state => <button onClick={onOpenDialogButtonClick(state)}>Open Dialog</button> }
+        </Access>
+        <Read<boolean> from={dialog_is_open}>
+            { isOpen => <Dialog isOpen={isOpen} /> }
+        </Read>
+    </State> 
 ), document.getElementById('main'));
 
 // make it more like state, set state with values under a key, clear the key

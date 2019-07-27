@@ -36,10 +36,24 @@ html, body {
     box-shadow: 1px 3px 5px 5px rgba(0,0,0,0.4);
 }
 
-.dialog-appear {
+.dialog-appear, .dialog-enter {
+    opacity: 0;
+    display: flex;
+}
+
+.dialog-appear-active, .dialog-enter-active {
+    opacity: 1;
+}
+
+.dialog-exit {
+    opacity: 1;
+}
+
+.dialog-exit-active {
     opacity: 0;
 }
 
-.dialog-appear-active {
-    opacity: 1;
+.dialog-exit-done {
+    opacity: 0;
+    display: none;
 }

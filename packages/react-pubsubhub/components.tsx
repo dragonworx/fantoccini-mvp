@@ -1,27 +1,24 @@
 import * as React from 'react';
-import { ReactElement, useState, createContext } from 'react';
-import { CSSTransition } from 'react-transition-group';
+import { ReactElement, useState, createContext, FC } from 'react';
 
 import {
-    HubListenerPattern,
-    SubRenderFunc,
-    Event,
-    HubController,
-    HubRefCallback,
-    PubRenderFunc,
+    ReadRenderFunc,
+    StateStore,
+    StateRefCallback,
+    AccessRenderFunc,
 } from './types';
 
-export const PubSubContext = createContext<HubProps>({});
+export const Context = createContext<StateProps>({});
 
-export interface PubProps {
-    children?: PubRenderFunc;
+export interface AccessProps {
+    children?: AccessRenderFunc;
 }
 
-export const Pub = (props: PubProps) => {
+export const Access = (props: AccessProps) => {
     return (
-        <PubSubContext.Consumer>
+        <Context.Consumer>
         {
-            ({hub}) => {
+            ({state: hub}) => {
                 const { children } = props;
                 if (!children) {
                     return null;
@@ -29,95 +26,76 @@ export const Pub = (props: PubProps) => {
                 return children(hub);
             }
         }
-        </PubSubContext.Consumer>
+        </Context.Consumer>
     )
 }
 
-export interface SubProps {
-    on: HubListenerPattern;
-    defaults?: any[];
-    children?: SubRenderFunc;
+export interface ReadProps<T> {
+    from: string;
+    defaultValue?: T;
+    children?: ReadRenderFunc<T>;
 }
 
-export const Sub = (props: SubProps) => {
-    const [ event, setEvent ] = useState(null);
+export function Read<T>(props: ReadProps<T>) {
+    const [ value, setValue ] = useState();
 
     return (
-        <PubSubContext.Consumer>
+        <Context.Consumer>
         {
-            ({hub}) => {
-                const { on, defaults, children } = props;
-                hub.on(on, event => {
-                    setEvent(event);
+            ({state}) => {
+                const { from: on, defaultValue, children } = props;
+                state.on<T>(on, value => {
+                    setValue(value);
                 });
-                if (!children || !event) {
-                    if (defaults) {
-                        return children(new Event(null, ...defaults));
+                if (!children || value === undefined) {
+                    if (defaultValue) {
+                        return children(defaultValue);
                     }
                     return null;
                 }
-                return children(event);
+                return children(value);
             }
         }
-        </PubSubContext.Consumer>
+        </Context.Consumer>
     )
-}
+};
 
-export interface HubProps {
-    hub?: HubController;
-    hubRef?: HubRefCallback;
+export interface StateProps {
+    state?: StateStore;
+    stateRef?: StateRefCallback;
     children?: ReactElement<any>[];
 }
 
-export const Hub = (props: HubProps) => {
-    const { hub = new HubController(), hubRef, children } = props;
-    hubRef && hubRef(hub);
+export const State = (props: StateProps) => {
+    const { state = new StateStore(), stateRef, children } = props;
+    stateRef && stateRef(state);
     return (
-        <PubSubContext.Provider value={{ hub }}>
+        <Context.Provider value={{ state }}>
             {children}
-        </PubSubContext.Provider>
+        </Context.Provider>
     )
 }
 
-export interface SendProps {
-    name: string;
-    args?: any[];
+export interface SetProps {
+    key: string;
+    value: any;
     delayMs?: number;
 }
 
-export const Send = (props: SendProps) => {
+export const Set = (props: SetProps) => {
     return (
-        <PubSubContext.Consumer>
+        <Context.Consumer>
         {
-            ({hub}) => {
-                const { name, args = [], delayMs = -1 } = props;
-                const event = new Event(name, args);
+            ({state}) => {
+                const { key, value, delayMs = -1 } = props;
                 if (typeof delayMs === 'number' && delayMs > -1) {
-                    setTimeout(() => hub.emit(event), delayMs);
+                    setTimeout(() => state.set(key, value), delayMs);
                 } else {
-                    hub.emit(event);
+                    state.set(key, value);
                 }
                 return null;
             }
         }
-        </PubSubContext.Consumer>
-    )
-}
-
-export const Clear = (props: SendProps) => {
-    return (
-        <PubSubContext.Consumer>
-        {
-            ({hub}) => {
-                const { name, args = [], delayMs = -1 } = props;
-                if (typeof delayMs === 'number' && delayMs > -1) {
-                    setTimeout(() => hub.clear(name), delayMs);
-                } else {
-                    hub.clear(name);
-                }
-                return null;
-            }
-        }
-        </PubSubContext.Consumer>
+        </Context.Consumer>
     )
 }
