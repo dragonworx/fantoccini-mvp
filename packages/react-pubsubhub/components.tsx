@@ -1,21 +1,19 @@
 import * as React from 'react';
 import { ReactElement, useState, createContext } from 'react';
+import { CSSTransition } from 'react-transition-group';
 
 import {
-    QueueRefCallback,
-    PubRenderFunc,
-    EventQueue,
     HubListenerPattern,
     SubRenderFunc,
     Event,
     HubController,
     HubRefCallback,
+    PubRenderFunc,
 } from './types';
 
 export const PubSubContext = createContext<HubProps>({});
 
 export interface PubProps {
-    queueRef?: QueueRefCallback;
     children?: PubRenderFunc;
 }
 
@@ -24,13 +22,11 @@ export const Pub = (props: PubProps) => {
         <PubSubContext.Consumer>
         {
             ({hub}) => {
-                const { queueRef, children } = props;
-                const queue = new EventQueue(hub);
-                queueRef && queueRef(queue);
+                const { children } = props;
                 if (!children) {
                     return null;
                 }
-                return children(queue);
+                return children(hub);
             }
         }
         </PubSubContext.Consumer>

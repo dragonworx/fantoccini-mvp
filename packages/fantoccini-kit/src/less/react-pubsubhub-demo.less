@@ -26,6 +26,7 @@ html, body {
     display: flex;
     align-items: center;
     justify-content: center;
+    transition: opacity 1000ms;
 }
 
 .dialog-container {
@@ -33,4 +34,12 @@ html, body {
     background-color: white;
     height: 50%;
     box-shadow: 1px 3px 5px 5px rgba(0,0,0,0.4);
+}
+
+.dialog-appear {
+    opacity: 0;
+}
+
+.dialog-appear-active {
+    opacity: 1;
 }

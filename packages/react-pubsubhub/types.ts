@@ -4,8 +4,7 @@ export const EventQueueDefaultOptions = {
     autoFlush: true,
 };
 
-export type QueueRefCallback = (queue: EventQueue) => void;
-export type PubRenderFunc = (queue: EventQueue) => ReactElement;
+export type PubRenderFunc = (hub: HubController) => ReactElement;
 export type SubRenderFunc = (event: Event) => ReactElement;
 export type HubRefCallback = (hub: HubController) => void;
 export type HubListenerPattern = string | RegExp;
@@ -31,32 +30,6 @@ export class Event {
     toString() {
         const { timestamp, name, args } = this;
         return `[${timestamp}]:${name ? '"' + name + '"' : 'null'} ${JSON.stringify(args)}`;
-    }
-}
-
-export class EventQueue {
-    private events: Event[] = [];
-
-    constructor(readonly hub: HubController, readonly options: EventQueueOptions = EventQueueDefaultOptions) {
-    }
-
-    emit(name: string, ...args: any[]) {
-        const event = new Event(name, args);
-        this.events.push(event);
-        if (this.options.autoFlush) {
-            this.flush();
-        }
-    }
-
-    flush() {
-        this.events.forEach(event => {
-            this.hub.emit(event);
-        });
-        this.events.length = 0;
-    }
-
-    clear(name: string) {
-        this.hub.clear(name);
     }
 }
 
