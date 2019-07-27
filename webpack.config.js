@@ -21,6 +21,7 @@ module.exports = (env) => {
             alias: {
                 'react-blit': path.resolve(__dirname, 'packages/react-blit/'),
                 'fantoccini-kit': path.resolve(__dirname, 'packages/fantoccini-kit'),
+                'react-pubsubhub': path.resolve(__dirname, 'packages/react-pubsubhub'),
             }
         },
         module: {

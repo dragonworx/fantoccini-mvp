@@ -1,0 +1,36 @@
+@import (reference) './variables';
+@import (reference) './common';
+
+* {
+    box-sizing: content-box;
+}
+
+html, body {
+    .expand-to-fill();
+    overflow: hidden;
+    background-color: rgb(85, 85, 85);
+    color: cyan;
+}
+
+#main {
+    .expand-to-fill();
+    padding: @padding;
+    background-color: #ccc;
+    display: flex;
+    flex-direction: column;
+}
+
+.dialog-blanket {
+    .expand-to-fill();
+    background-color: rgba(0,0,0,0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.dialog-container {
+    flex-grow: 0.5;
+    background-color: white;
+    height: 50%;
+    box-shadow: 1px 3px 5px 5px rgba(0,0,0,0.4);
+}

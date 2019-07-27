@@ -10,6 +10,7 @@
         "paths": {
             "react-blit/*": [ "./react-blit/*" ],
             "fantoccini-kit/*": [ "./fantoccini-kit/*" ],
+            "react-pubsubhub/*": [ "./react-pubsubhub/*" ],
         },
     },
     "include": [
