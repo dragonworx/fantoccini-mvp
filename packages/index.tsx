@@ -50,11 +50,17 @@ interface Props {
 }
 
 const Dialog = ({isOpen}: Props) => {
+    const timeout={
+        appear: 1000,
+        enter: 1000,
+        exit: 200,
+    };
+
     return (
-        <CSSTransition in={isOpen} timeout={1000} classNames="dialog" appear={isOpen}>
+        <CSSTransition in={isOpen} timeout={timeout} classNames="dialog" appear={isOpen}>
             <div className="dialog-blanket">
                 <div className="dialog-container">
-                    Dialog!
+                    <h1>Dialog</h1>
                     <Access>
                         { state => <button onClick={onCloseDialogButtonClick(state)}>Close</button>}
                     </Access>
@@ -64,8 +70,16 @@ const Dialog = ({isOpen}: Props) => {
     );
 };
 
+const stateRef = (state: StateStore) => {
+    window.addEventListener('keyup', e => {
+        if (e.keyCode === 27) {
+            state.set(dialog_is_open, false);
+        }
+    });
+};
+
 ReactDOM.render((
-    <State>
+    <State stateRef={stateRef}>
         <Access>
             { state => <button onClick={onOpenDialogButtonClick(state)}>Open Dialog</button> }
         </Access>

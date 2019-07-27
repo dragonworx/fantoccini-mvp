@@ -9,7 +9,6 @@ html, body {
     .expand-to-fill();
     overflow: hidden;
     background-color: rgb(85, 85, 85);
-    color: cyan;
 }
 
 #main {
@@ -26,7 +25,6 @@ html, body {
     display: flex;
     align-items: center;
     justify-content: center;
-    transition: opacity 1000ms;
 }
 
 .dialog-container {
@@ -34,11 +32,16 @@ html, body {
     background-color: white;
     height: 50%;
     box-shadow: 1px 3px 5px 5px rgba(0,0,0,0.4);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-evenly;
 }
 
 .dialog-appear, .dialog-enter {
     opacity: 0;
     display: flex;
+    transition: opacity 1000ms;
 }
 
 .dialog-appear-active, .dialog-enter-active {
@@ -47,6 +50,7 @@ html, body {
 
 .dialog-exit {
     opacity: 1;
+    transition: opacity 200ms;
 }
 
 .dialog-exit-active {
