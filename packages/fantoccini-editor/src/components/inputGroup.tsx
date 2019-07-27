@@ -35,7 +35,7 @@ export class InputGroup extends Component<Props, State> {
     render() {
         const { selected } = this.state;
         const { direction, id, className, hAlign, vAlign } = this.props;
-        const children = cloneChildren(this.props.children, (child: ReactElement<InputGroupItemProps>) => ({
+        const children = cloneChildren('inputg', this.props.children, (child: ReactElement<InputGroupItemProps>) => ({
             onChange: this.onChange,
             isGroupSelected: selected === child.props.name,
         }));

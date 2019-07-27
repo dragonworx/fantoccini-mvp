@@ -5,8 +5,9 @@ export function cloneChildren(propsChildren: ReactNode, resolver: (child: ReactE
     const children: any[] = React.Children.map(propsChildren, (child: ReactElement<any>, i: number) => {
         const props = {
             key: i,
+            index: i,
             ...resolver(child)
-        };
+        };console.log(props);
         return React.cloneElement(child, props) as any;
     });
     return children;

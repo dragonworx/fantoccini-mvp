@@ -11,7 +11,7 @@ export interface GridAlignProps extends CssSelectableProps {
 export class GridElement extends Component<GridAlignProps, {}> {
     cloneChildrenWithProps() {
         const { hAlign, vAlign } = this.props;
-        return cloneChildren(this.props.children, (child: ReactElement<GridAlignProps>) => ({
+        return cloneChildren('grid', this.props.children, (child: ReactElement<GridAlignProps>) => ({
             hAlign: hAlign || child.props.hAlign,
             vAlign: vAlign || child.props.vAlign,
         }));

@@ -7,4 +7,4 @@ export { CssSelectableProps };
 export { Component } from './elements';
 export * from './primatives';
 export interface Props extends PropsWithChildren<CssSelectableProps> {}
-export { px, css } from '../util';
+export { px, css, cloneChildren } from '../util';

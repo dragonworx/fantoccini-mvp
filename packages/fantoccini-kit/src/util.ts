@@ -1,11 +1,12 @@
 import * as React from 'react';
 import { ReactNode, ReactElement} from 'react';
 
-export function cloneChildren(propsChildren: ReactNode, resolver: (child: ReactElement<any>) => {}) {
+export function cloneChildren(keyPrefix: string, propsChildren: ReactNode, resolver?: (child: ReactElement<any>) => {}) {
     const children: any[] = React.Children.map(propsChildren, (child: ReactElement<any>, i: number) => {
         const props = {
-            key: i,
-            ...resolver(child)
+            key: `${keyPrefix}${i}`,
+            index: i,
+            ...(resolver ? resolver(child) : {})
         };
         return React.cloneElement(child, props) as any;
     });

@@ -1,4 +1,5 @@
 export { Icon } from './src/components/Icon';
 export { Label } from './src/components/Label';
-export { Grid, Row, Cell, HLayout, VLayout } from './src/components/Grid';
+export { Table, Row, Cell } from './src/components/Table';
+export { HLayout, VLayout } from './src/components/Layout';
 export * from './src/util';

@@ -1,21 +1,35 @@
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-import { Icon, Label, Grid, Row, Cell, VLayout } from 'fantoccini-kit';
+import {
+    Pub,
+    Sub,
+    HubContext,
+    Hub,
+    EventQueue,
+} from 'fantoccini-kit/src/components/PubSubHub';
 
 import 'fantoccini-kit/src/less/_main';
 
+const hubRef = (hub: Hub) => {
+    hub.on('click.*', event => {
+        const [a, b] = event.args;
+        console.log(event.toString(), {a, b});
+    });
+    
+    setTimeout(() => hub.emit('click.bar'), 1000);
+};
+
+const queueRef = (queue: EventQueue) => {
+    setTimeout(() => queue.emit('click.baz'), 2000);
+};
+
 ReactDOM.render((
-    <>
-        <Label text="abc" position="after"><Icon id="icon1" className="custom-icon" src="./favicon.ico" /></Label>
-        <Grid id="grid1" spacing={10} padding={15}>
-            <Row>
-                <Cell width="200px">
-                    <VLayout>
-                        <span>a</span><span>b</span><span>c</span>
-                    </VLayout>
-                </Cell>
-                <Cell><span>a</span><span>b</span><span>c</span></Cell>
-            </Row>
-        </Grid>
-    </>
+    <HubContext hubRef={hubRef}>
+        <Pub queueRef={queueRef}>
+            { queue => <button onClick={() => queue.emit('click.foo', 123, 456)}>Emit</button> }
+        </Pub>
+        <Sub on={/^click.*/} defaults={[999]}>
+            { event => <span>{event.toString()}</span> }
+        </Sub>
+    </HubContext> 
 ), document.getElementById('main'));
