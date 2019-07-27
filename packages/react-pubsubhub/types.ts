@@ -17,7 +17,7 @@ export interface StateListener {
 export type PlainObject = { [key: string]: any };
 
 export class StateStore {
-    state: PlainObject;
+    state: PlainObject = {};
     listeners: StateListener[] = [];
 
     on<T>(pattern: string, handler: StateListenerHandler<T>) {
@@ -29,6 +29,7 @@ export class StateStore {
 
     set(key: string, value: any) {
         console.log('State.set', key, value);
+        this.state[key] = value;
         const { listeners } = this;
         const l = listeners.length;
         for (let i = 0; i < l; i++) {
@@ -37,5 +38,10 @@ export class StateStore {
                 listener.handler(value);
             }
         }
+    }
+
+    get(key: string, defaultValue?: any) {
+        const value = this.state[key];
+        return value === undefined ? defaultValue : value;
     }
 }

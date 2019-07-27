@@ -72,7 +72,8 @@ const Dialog = ({isOpen}: Props) => {
 
 const stateRef = (state: StateStore) => {
     window.addEventListener('keyup', e => {
-        if (e.keyCode === 27) {
+        const isDialogOpen = state.get(dialog_is_open, false);
+        if (e.keyCode === 27 && isDialogOpen) {
             state.set(dialog_is_open, false);
         }
     });
