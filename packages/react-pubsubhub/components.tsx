@@ -3,12 +3,12 @@ import { ReactElement, useState, createContext, FC } from 'react';
 
 import {
     ReadRenderFunc,
-    StateStore,
-    StateRefCallback,
+    DataStore,
+    StoreRefCallback,
     AccessRenderFunc,
 } from './types';
 
-export const Context = createContext<StateProps>({});
+export const Context = createContext<StoreProps>({});
 
 export interface AccessProps {
     children?: AccessRenderFunc;
@@ -18,7 +18,7 @@ export const Access = (props: AccessProps) => {
     return (
         <Context.Consumer>
         {
-            ({state: hub}) => {
+            ({store: hub}) => {
                 const { children } = props;
                 if (!children) {
                     return null;
@@ -42,9 +42,9 @@ export function Read<T>(props: ReadProps<T>) {
     return (
         <Context.Consumer>
         {
-            ({state}) => {
+            ({store}) => {
                 const { from: on, defaultValue, children } = props;
-                state.on<T>(on, value => {
+                store.on<T>(on, value => {
                     setValue(value);
                 });
                 if (!children || value === undefined) {
@@ -60,17 +60,17 @@ export function Read<T>(props: ReadProps<T>) {
     )
 };
 
-export interface StateProps {
-    state?: StateStore;
-    stateRef?: StateRefCallback;
+export interface StoreProps {
+    store?: DataStore;
+    storeRef?: StoreRefCallback;
     children?: ReactElement<any>[];
 }
 
-export const State = (props: StateProps) => {
-    const { state = new StateStore(), stateRef, children } = props;
-    stateRef && stateRef(state);
+export const Store = (props: StoreProps) => {
+    const { store: state = new DataStore(), storeRef, children } = props;
+    storeRef && storeRef(state);
     return (
-        <Context.Provider value={{ state }}>
+        <Context.Provider value={{ store: state }}>
             {children}
         </Context.Provider>
     )
@@ -82,16 +82,16 @@ export interface SetProps {
     delayMs?: number;
 }
 
-export const Set = (props: SetProps) => {
+export const StoreWrite = (props: SetProps) => {
     return (
         <Context.Consumer>
         {
-            ({state}) => {
+            ({store}) => {
                 const { key, value, delayMs = -1 } = props;
                 if (typeof delayMs === 'number' && delayMs > -1) {
-                    setTimeout(() => state.set(key, value), delayMs);
+                    setTimeout(() => store.set(key, value), delayMs);
                 } else {
-                    state.set(key, value);
+                    store.set(key, value);
                 }
                 return null;
             }

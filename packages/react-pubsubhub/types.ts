@@ -1,47 +1,43 @@
 import { ReactElement } from 'react';
 
-export type AccessRenderFunc = (state: StateStore) => ReactElement;
+export type AccessRenderFunc = (store: DataStore) => ReactElement;
 export type ReadRenderFunc<T> = (value: T) => ReactElement;
-export type StateRefCallback = (state: StateStore) => void;
-export type StateListenerHandler<T> = (value: any) => void;
+export type StoreRefCallback = (store: DataStore) => void;
+export type DataStoreListenerHandler<T> = (value: T) => void;
 
-export interface EventQueueOptions {
-    autoFlush: boolean;
-}
-
-export interface StateListener {
-    pattern: string;
-    handler: StateListenerHandler<any>;
+export interface DataStoreListener {
+    key: string;
+    handler: DataStoreListenerHandler<any>;
 }
 
 export type PlainObject = { [key: string]: any };
 
-export class StateStore {
+export class DataStore {
     state: PlainObject = {};
-    listeners: StateListener[] = [];
+    listeners: DataStoreListener[] = [];
 
-    on<T>(pattern: string, handler: StateListenerHandler<T>) {
+    on<T>(pattern: string, handler: DataStoreListenerHandler<T>) {
         this.listeners.push({
-            pattern,
+            key: pattern,
             handler,
         });
     }
 
-    set(key: string, value: any) {
-        console.log('State.set', key, value);
+    set<T>(key: string, value: T) {
+        console.log(`"${key}"`, value);
         this.state[key] = value;
         const { listeners } = this;
         const l = listeners.length;
         for (let i = 0; i < l; i++) {
             const listener = listeners[i];
-            if (key === listener.pattern) {
+            if (key === listener.key) {
                 listener.handler(value);
             }
         }
     }
 
-    get(key: string, defaultValue?: any) {
-        const value = this.state[key];
+    get<T>(key: string, defaultValue?: T): T {
+        const value = this.state[key] as T;
         return value === undefined ? defaultValue : value;
     }
 }
