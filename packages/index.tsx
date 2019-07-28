@@ -1,14 +1,12 @@
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
-import { Access, Read, Store, DataStore, StoreWrite } from 'react-pubsubhub';
+import { State,  Read, Store } from 'react-pubsubhub';
 import { CSSTransition } from 'react-transition-group';
 
 import 'fantoccini-kit/src/less/react-pubsubhub-demo';
 
-const dialog_is_open = 'dialog.is.open';
-
-const onOpenDialogButtonClick = (store: DataStore) => () => store.set(dialog_is_open, true);
-const onCloseDialogButtonClick = (store: DataStore) => () => store.set(dialog_is_open, false);
+const onOpenDialogButtonClick = (state: ExampleState) => () => state.isOpen = true;
+const onCloseDialogButtonClick = (state: ExampleState) => () => state.isOpen = false;
 
 interface Props {
     isOpen: boolean;
@@ -26,33 +24,40 @@ const Dialog = ({isOpen}: Props) => {
             <div className="dialog-blanket">
                 <div className="dialog-container">
                     <h1>Dialog</h1>
-                    <Access>
-                        { store => <button onClick={onCloseDialogButtonClick(store)}>Close</button>}
-                    </Access>
+                    <State>
+                        { state => <button onClick={onCloseDialogButtonClick(state)}>Close</button>}
+                    </State>
                 </div>
             </div>
         </CSSTransition>
     );
 };
 
-const storeRef = (store: DataStore) => {
+interface ExampleState {
+    isOpen: boolean;
+}
+
+const stateRef = (state: ExampleState) => {
     window.addEventListener('keyup', e => {
-        const isDialogOpen = store.get<boolean>(dialog_is_open, false);
-        if (e.keyCode === 27 && isDialogOpen) {
-            store.set(dialog_is_open, false);
+        if (e.keyCode === 27 && state.isOpen) {
+            state.isOpen = true;
         }
     });
 };
 
+const defaults: ExampleState = {
+    isOpen: false,
+};
+
 ReactDOM.render((
-    <Store storeRef={storeRef}>
-        <Access>
-            { store => <button onClick={onOpenDialogButtonClick(store)}>Open Dialog</button> }
-        </Access>
-        <Read<boolean> from={dialog_is_open}>
-            { isOpen => <Dialog isOpen={isOpen} /> }
+    <Store defaults={defaults}>
+        <State>
+            { state => <button onClick={onOpenDialogButtonClick(state)}>Open Dialog</button> }
+        </State>
+        <Read from={(state: ExampleState) => state.isOpen}>
+            { (isOpen: boolean) => <Dialog isOpen={isOpen} /> }
         </Read>
-    </Store> 
+    </Store>
 ), document.getElementById('main'));
 
 // make it more like state, set state with values under a key, clear the key

@@ -1,43 +1,57 @@
 import { ReactElement } from 'react';
 
-export type AccessRenderFunc = (store: DataStore) => ReactElement;
-export type ReadRenderFunc<T> = (value: T) => ReactElement;
-export type StoreRefCallback = (store: DataStore) => void;
-export type DataStoreListenerHandler<T> = (value: T) => void;
-
-export interface DataStoreListener {
-    key: string;
-    handler: DataStoreListenerHandler<any>;
-}
-
 export type PlainObject = { [key: string]: any };
 
-export class DataStore {
-    state: PlainObject = {};
-    listeners: DataStoreListener[] = [];
+export type Handler = (key: string, value: any) => void;
 
-    on<T>(pattern: string, handler: DataStoreListenerHandler<T>) {
-        this.listeners.push({
-            key: pattern,
-            handler,
-        });
-    }
+export interface Listener {
+    key: string;
+    handler: Handler;
+}
 
-    set<T>(key: string, value: T) {
-        console.log(`"${key}"`, value);
-        this.state[key] = value;
-        const { listeners } = this;
-        const l = listeners.length;
-        for (let i = 0; i < l; i++) {
+export type ListenerHook = (key: string, handler: Handler) => void;
+
+export function proxy<T extends PlainObject>(source: T) {
+    const clone = {} as any;
+    const listeners: Listener[] = [];
+    const addListener: ListenerHook = (key: string, handler: Handler) => {
+        console.log("__ADDLISTENER", key);
+        listeners.push({key, handler});
+        const count = listeners.filter(listener => listener.key === key).length;
+        console.log(count);
+    };
+    const removeListener: ListenerHook = (key: string, handler: Handler) => {
+        for (let i = 0; i < listeners.length; i++) {
             const listener = listeners[i];
-            if (key === listener.key) {
-                listener.handler(value);
+            if (listener.key === key && listener.handler === handler) {
+                listeners.splice(i, 1);
+                console.log("__REMOVELISTENER", key);
+                return;
             }
         }
+    };
+    for (let key in source) {
+        Object.defineProperty(clone, key, {
+            get() {
+                const value = source[key];
+                console.log("__GET", key, value);
+                (clone as ProxyState).__lastGet = key;
+                return value;
+            },
+            set(value: any) {
+                source[key] = value;
+                console.log("__SET", key, value);
+                listeners.forEach(listener => (listener.key === key) && listener.handler(key, value))
+            }
+        })
     }
+    (clone as ProxyState).__addListener = addListener;
+    (clone as ProxyState).__removeListener = removeListener;
+    return clone as T;
+}
 
-    get<T>(key: string, defaultValue?: T): T {
-        const value = this.state[key] as T;
-        return value === undefined ? defaultValue : value;
-    }
+export interface ProxyState {
+    __addListener: ListenerHook;
+    __removeListener: ListenerHook;
+    __lastGet?: string;
 }
