@@ -17,6 +17,12 @@ html, body {
     .expand-to-fill();
     overflow: hidden;
     background-color: rgb(85, 85, 85);
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif
+}
+
+label span {
+    font-weight: bold;
+    display: block;
 }
 
 #main, #example {
@@ -27,9 +33,13 @@ html, body {
     flex-direction: column;
 }
 
-#rect {
-    width: 100px;
-    height: 100px;
+button {
+    color: white;
+    background-color: #333;
+    border: none;
+    padding: 10px;
+    border-radius: 10px;
+    min-width: 100px;
 }
 
 .dialog-blanket {
@@ -44,12 +54,12 @@ html, body {
 .dialog-container {
     flex-grow: 0.5;
     background-color: white;
-    height: 50%;
+    height: 80%;
     box-shadow: 1px 3px 5px 5px rgba(0,0,0,0.4);
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: space-evenly;
+    justify-content: space-around;
     max-width: 50%;
 }
 

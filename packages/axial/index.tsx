@@ -7,6 +7,48 @@ export type Getter = (key: string) => void;
 export type Setter = (key: string, value: any) => void;
 export type ProxyListener = (value: any) => void;
 
+export type ArrayIteratorFn = (item: any, i: number, array: Array<any>) => any;
+
+
+export class Collection<T> {
+    items: T[] = [];
+    private _proxy?: Proxy<any>;
+    private _key?: string;
+
+    constructor(array: Array<T> = []) {
+        this.items.push.apply(this.items, array);
+    }
+
+    get length() {
+        return this.items.length;
+    }
+
+    private updateProxy() {
+        if (this._proxy) {
+            this._proxy.onSet(this._key, this);
+        }
+    }
+
+    setProxy(key: string, proxy: Proxy<any>) {
+        this._key = key;
+        this._proxy = proxy;
+    }
+
+    add(item: T) {
+        this.items.push(item);
+        this.updateProxy();
+    }
+
+    map(fn: ArrayIteratorFn) {
+        return this.items.map(fn);
+    }
+
+    clear() {
+        this.items.length = 0;
+        this.updateProxy();
+    }
+}
+
 export class Proxy<T extends PlainObject> {
     state: T;
     listeners: Map<string, ProxyListener[]> = new Map;
@@ -14,18 +56,33 @@ export class Proxy<T extends PlainObject> {
     accessedGetters: string[] = [];
 
     constructor(source: T) {
+        const values = {
+            ...source,
+        } as PlainObject;
         const clone = {} as T;
         const { onGet, onSet } = this;
     
-        for (let key in source) {
+        for (let key in values) {
+            const value = values[key];
+            if (Array.isArray(value)) {
+                const array = value as Array<any>;
+                const nativePush = array.push;
+                array.push = (...args) => {
+                    const returnValue = nativePush.apply(array, args);
+                    this.onSet(key, array);
+                    return returnValue;
+                };
+            } else if (value instanceof Collection) {
+                (value as Collection<any>).setProxy(key, this);
+            }
             Object.defineProperty(clone, key, {
                 get() {
-                    const value = source[key];
+                    const value = values[key];
                     onGet(key);
                     return value;
                 },
                 set(value: any) {
-                    source[key] = value;
+                    values[key] = value;
                     onSet(key, value);
                 }
             });
@@ -136,7 +193,7 @@ function Consumer<T>(props: ConsumerProps<T>) {
     );
 }
 
-export const State = {
+export const Axial = {
     Provider,
     Consumer,
 };
