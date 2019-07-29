@@ -22,6 +22,7 @@ module.exports = (env) => {
                 'react-blit': path.resolve(__dirname, 'packages/react-blit/'),
                 'fantoccini-kit': path.resolve(__dirname, 'packages/fantoccini-kit'),
                 'react-pubsubhub': path.resolve(__dirname, 'packages/react-pubsubhub'),
+                'axial': path.resolve(__dirname, 'packages/axial'),
             }
         },
         module: {
