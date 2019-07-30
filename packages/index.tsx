@@ -1,7 +1,7 @@
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import { CSSTransition } from 'react-transition-group';
-import { Axial, Collection } from 'axial';
+import { Scope, State, AxialArray } from 'axial';
 
 import './index.less';
 
@@ -18,15 +18,13 @@ const randomRGB = () => {
 interface ExampleState {
     isOpen: boolean;
     message: string;
-    array: string[];
-    collection: Collection<string>;
+    array: AxialArray<string>;
 }
 
 const defaults: ExampleState = {
     isOpen: false,
     message: '',
     array: [randomString()],
-    collection: new Collection([randomString()]),
 };
 
 /** Dialog */
@@ -43,7 +41,7 @@ const Dialog = ({ isOpen }: DialogProps) => {
             <div className="dialog-blanket">
                 <div className="dialog-container">
                     <h1>Dialog</h1>
-                    <Axial.Consumer>
+                    <State>
                         {
                             (state: ExampleState) => (
                                 <>
@@ -61,22 +59,12 @@ const Dialog = ({ isOpen }: DialogProps) => {
                                         </ul>
                                     </label>
 
-                                    <label>
-                                        <span>Collection:</span>
-                                        <ul>
-                                        {
-                                            state.collection.map((item, i) => <li key={i}>{item}</li>)
-                                        }
-                                        </ul>
-                                    </label>
-
                                     <button onClick={onCloseDialogButtonClick(state)}>Close</button>
                                     <button onClick={onAddArrayItem(state)}>Add Array Item</button>
-                                    <button onClick={onAddCollectionItem(state)}>Add Collection Item</button>
                                 </>
                             )
                         }
-                    </Axial.Consumer>
+                    </State>
                 </div>
             </div>
         </CSSTransition>
@@ -95,18 +83,9 @@ const onCloseDialogButtonClick = (state: ExampleState) => () => state.isOpen = f
 const onAddArrayItem = (state: ExampleState) => () => {
     const item = randomString();
     state.array.push(item);
-    if (state.array.length > 5) {
-        state.array.length = 0;
+    if (state.array.count > 5) {
+        state.array.count = 0;
         state.array.push(item);
-    }
-}
-
-const onAddCollectionItem = (state: ExampleState) => () => {
-    const item = randomString();
-    state.collection.add(item);
-    if (state.collection.length > 5) {
-        state.collection.clear();
-        state.collection.add(item);
     }
 }
 
@@ -115,8 +94,8 @@ const onAddCollectionItem = (state: ExampleState) => () => {
 ReactDOM.render((
     <div id="example">
         <h1>Do you even Axial...</h1>
-        <Axial.Provider defaults={defaults}>
-            <Axial.Consumer>
+        <Scope defaults={defaults}>
+            <State>
                 {
                     (state: ExampleState) => (
                         <>
@@ -130,7 +109,8 @@ ReactDOM.render((
                         </>
                     )
                 }
-            </Axial.Consumer>
-        </Axial.Provider>
+            </State>
+        </Scope>
     </div>
 ), document.getElementById('main'));
+ 

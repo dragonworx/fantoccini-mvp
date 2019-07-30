@@ -7,46 +7,75 @@ export type Getter = (key: string) => void;
 export type Setter = (key: string, value: any) => void;
 export type ProxyListener = (value: any) => void;
 
-export type ArrayIteratorFn = (item: any, i: number, array: Array<any>) => any;
+export type ArrayIteratorFn = (item: any, i: number, array: any[]) => any;
 
+export class ProxyArray<T> extends Array<T> {
+    proxy: Proxy<any>;
+    key: string;
 
-export class Collection<T> {
-    items: T[] = [];
-    private _proxy?: Proxy<any>;
-    private _key?: string;
-
-    constructor(array: Array<T> = []) {
-        this.items.push.apply(this.items, array);
+    constructor(...items: any[]) {
+        super(...items);
+        Object.setPrototypeOf(this, Object.create(ProxyArray.prototype));
     }
 
-    get length() {
-        return this.items.length;
+    private updateProxySetter() {
+        this.proxy.onSet(this.key, this);
     }
 
-    private updateProxy() {
-        if (this._proxy) {
-            this._proxy.onSet(this._key, this);
-        }
+    private updateProxyGetter() {
+        this.proxy.onGet(this.key);
     }
 
-    setProxy(key: string, proxy: Proxy<any>) {
-        this._key = key;
-        this._proxy = proxy;
+    get count() {
+        this.updateProxyGetter();
+        return this.length;
     }
 
-    add(item: T) {
-        this.items.push(item);
-        this.updateProxy();
+    init(proxy: Proxy<any>, key: string) {
+        this.proxy = proxy;
+        this.key = key;
     }
 
-    map(fn: ArrayIteratorFn) {
-        return this.items.map(fn);
+    set count(value: number) {
+        this.length = value;
+        this.updateProxySetter();
     }
 
-    clear() {
-        this.items.length = 0;
-        this.updateProxy();
+    map(...args: any[]) {
+        this.updateProxyGetter();
+        return super.map.apply(this, args);
     }
+
+    find(...args: any[]) {
+        this.updateProxyGetter();
+        return super.find.apply(this, args);
+    }
+
+    filter(...args: any[]) {
+        this.updateProxyGetter();
+        return super.filter.apply(this, args);
+    }
+
+    push(...args: any[]) {
+        const result = super.push.apply(this, args);
+        this.updateProxySetter();
+        return result;
+    }
+
+    pop(...args: any[]) {
+        this.updateProxyGetter();
+        return super.pop.apply(this, args);
+    }
+
+    splice(...args: any[]) {
+        const result = super.splice.apply(this, args);
+        this.updateProxySetter();
+        return result;
+    }
+}
+
+export interface AxialArray<T> extends Array<T> {
+    count?: number;
 }
 
 export class Proxy<T extends PlainObject> {
@@ -65,15 +94,9 @@ export class Proxy<T extends PlainObject> {
         for (let key in values) {
             const value = values[key];
             if (Array.isArray(value)) {
-                const array = value as Array<any>;
-                const nativePush = array.push;
-                array.push = (...args) => {
-                    const returnValue = nativePush.apply(array, args);
-                    this.onSet(key, array);
-                    return returnValue;
-                };
-            } else if (value instanceof Collection) {
-                (value as Collection<any>).setProxy(key, this);
+                const proxyArray = new ProxyArray(value);
+                proxyArray.init(this, key);
+                values[key] = proxyArray;
             }
             Object.defineProperty(clone, key, {
                 get() {
@@ -139,12 +162,12 @@ export class Proxy<T extends PlainObject> {
 
 export const Context = createContext<Proxy<any>>(null);
 
-export interface StoreProps<T> {
+export interface ScopeProps<T> {
     defaults: T;
     children?: any;
 }
 
-function Provider<T>(props: StoreProps<T>) {
+export function Scope<T>(props: ScopeProps<T>) {
     const { defaults, children } = props;
     const proxy = new Proxy(defaults);
     (window as any).state = proxy.state;
@@ -155,11 +178,11 @@ function Provider<T>(props: StoreProps<T>) {
     )
 }
 
-export interface ConsumerProps<T> {
+export interface StateProps<T> {
     children?: ConsumerRenderFn<T>;
 }
 
-function Consumer<T>(props: ConsumerProps<T>) {
+export function State<T>(props: StateProps<T>) {
     const { children } = props;
     const [ value, setValue ] = useState(0);
 
@@ -192,8 +215,3 @@ function Consumer<T>(props: ConsumerProps<T>) {
         </Context.Consumer>
     );
 }
-
-export const Axial = {
-    Provider,
-    Consumer,
-};
