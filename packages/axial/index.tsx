@@ -1,11 +1,11 @@
 import * as React from 'react';
 import { ReactElement, createContext, useState, useEffect } from 'react';
 
-export type ConsumerRenderFn<T> = (state: T) => ReactElement;
+export type StateRenderFn<T> = (state: T) => ReactElement;
 export type PlainObject = { [key: string]: any };
 export type Getter = (key: string) => void;
 export type Setter = (key: string, value: any) => void;
-export type ProxyListener = (value: any) => void;
+export type ProxyListener<T> = (key: string, value: T) => void;
 
 export type ArrayIteratorFn = (item: any, i: number, array: any[]) => any;
 
@@ -57,6 +57,7 @@ export class ProxyArray<T> extends Array<T> {
     }
 
     push(...args: any[]) {
+        this.updateProxyGetter();
         const result = super.push.apply(this, args);
         this.updateProxySetter();
         return result;
@@ -64,10 +65,13 @@ export class ProxyArray<T> extends Array<T> {
 
     pop(...args: any[]) {
         this.updateProxyGetter();
-        return super.pop.apply(this, args);
+        const result =  super.pop.apply(this, args);
+        this.updateProxySetter();
+        return result;
     }
 
     splice(...args: any[]) {
+        this.updateProxyGetter();
         const result = super.splice.apply(this, args);
         this.updateProxySetter();
         return result;
@@ -80,7 +84,7 @@ export interface AxialArray<T> extends Array<T> {
 
 export class Proxy<T extends PlainObject> {
     state: T;
-    listeners: Map<string, ProxyListener[]> = new Map;
+    listeners: Map<string, ProxyListener<any>[]> = new Map;
     captureGetters: boolean = false;
     accessedGetters: string[] = [];
 
@@ -125,11 +129,11 @@ export class Proxy<T extends PlainObject> {
     onSet = (key: string, value: any) => {
         const { listeners } = this;
         if (listeners.get(key)) {
-            listeners.get(key).forEach(handler => handler(value));
+            listeners.get(key).forEach(handler => handler(key, value));
         }
     };
 
-    addListener(key: string, handler: ProxyListener) {
+    addListener(key: string, handler: ProxyListener<any>) {
         const { listeners } = this;
         if (!listeners.get(key)) {
             listeners.set(key, []);
@@ -137,7 +141,7 @@ export class Proxy<T extends PlainObject> {
         listeners.get(key).push(handler);
     }
 
-    removeListener(handler: ProxyListener) {
+    removeListener(handler: ProxyListener<any>) {
         const { listeners } = this;
         for (var [, array] of listeners) {
             if (array) {
@@ -160,58 +164,62 @@ export class Proxy<T extends PlainObject> {
     }
 }
 
-export const Context = createContext<Proxy<any>>(null);
-
 export interface ScopeProps<T> {
-    defaults: T;
     children?: any;
 }
 
-export function Scope<T>(props: ScopeProps<T>) {
-    const { defaults, children } = props;
-    const proxy = new Proxy(defaults);
-    (window as any).state = proxy.state;
-    return (
-        <Context.Provider value={proxy}>
-            {children}
-        </Context.Provider>
-    )
-}
-
 export interface StateProps<T> {
-    children?: ConsumerRenderFn<T>;
+    children?: StateRenderFn<T>;
 }
 
-export function State<T>(props: StateProps<T>) {
-    const { children } = props;
-    const [ value, setValue ] = useState(0);
+export function createScope<T>(defaults: T) {
+    
+    const Context = createContext<Proxy<any>>(null);
 
-    const handler = (v: any) => {
-        setValue(value + 1);
-    };
+    function Scope<T>(props: ScopeProps<T>) {
+        const { children } = props;
+        const proxy = new Proxy(defaults);
+        (window as any).state = proxy.state;
+        return (
+            <Context.Provider value={proxy}>
+                {children}
+            </Context.Provider>
+        )
+    }
 
-    let proxyRef: Proxy<T>;
+    function State<T>(props: StateProps<T>) {
+        const { children } = props;
+        const [ , setValue ] = useState(0);
 
-    useEffect(() => {
-        return () => {
-            proxyRef.removeListener(handler);
-        }
-    });
+        const handler = (key: string, value: any) => {
+            setValue(value + 1);
+        };
 
-    return (
-        <Context.Consumer>
-            {
-                proxy => {
-                    proxyRef = proxy;
-                    proxy.beginCaptureGetters();
-                    const result = (children as ConsumerRenderFn<T>)(proxy.state);
-                    proxy.endCaptureGetters();
-                    proxy.accessedGetters.forEach(key => {
-                        proxy.addListener(key, handler);
-                    });
-                    return result;
-                }
+        let proxyRef: Proxy<T>;
+
+        useEffect(() => {
+            return () => {
+                proxyRef.removeListener(handler);
             }
-        </Context.Consumer>
-    );
+        });
+
+        return (
+            <Context.Consumer>
+                {
+                    proxy => {
+                        proxyRef = proxy;
+                        proxy.beginCaptureGetters();
+                        const result = (children as StateRenderFn<T>)(proxy.state);
+                        proxy.endCaptureGetters();
+                        proxy.accessedGetters.forEach(key => {
+                            proxy.addListener(key, handler);
+                        });
+                        return result;
+                    }
+                }
+            </Context.Consumer>
+        );
+    }
+
+    return [Scope, State];
 }

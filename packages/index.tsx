@@ -1,7 +1,7 @@
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import { CSSTransition } from 'react-transition-group';
-import { Scope, State, AxialArray } from 'axial';
+import { createScope, AxialArray } from 'axial';
 
 import './index.less';
 
@@ -13,19 +13,50 @@ const randomRGB = () => {
     return `rgb(${r},${g},${b})`;
 }
 
-/** State */
+/** State Setup */
 
-interface ExampleState {
+interface ExampleState1 {
     isOpen: boolean;
     message: string;
     array: AxialArray<string>;
 }
 
-const defaults: ExampleState = {
+interface ExampleState2 {
+    count: number;
+}
+
+const exampleState1Defaults: ExampleState1 = {
     isOpen: false,
     message: '',
     array: [randomString()],
 };
+
+const exampleState2Defaults: ExampleState2 = {
+    count: 0,
+};
+
+const [ ExampleState1Scope, ExampleState1State ] = createScope(exampleState1Defaults);
+const [ ExampleState2Scope, ExampleState2State ] = createScope(exampleState2Defaults);
+
+/** Actions */
+
+const onOpenDialogButtonClick = (state: ExampleState1) => () => {
+    state.message = randomString();
+    state.isOpen = !state.isOpen
+}
+
+const onCloseDialogButtonClick = (state: ExampleState1) => () => state.isOpen = false;
+
+const onAddArrayItem = (state: ExampleState1) => () => {
+    const item = randomString();
+    state.array.push(item);
+    if (state.array.count > 5) {
+        state.array.count = 0;
+        state.array.push(item);
+    }
+}
+
+const onCountClick = (state: ExampleState2) => () => state.count += 1;
 
 /** Dialog */
 
@@ -41,9 +72,9 @@ const Dialog = ({ isOpen }: DialogProps) => {
             <div className="dialog-blanket">
                 <div className="dialog-container">
                     <h1>Dialog</h1>
-                    <State>
+                    <ExampleState1State>
                         {
-                            (state: ExampleState) => (
+                            (state: ExampleState1) => (
                                 <>
                                     <label>
                                         <span>Message:</span>
@@ -59,45 +90,37 @@ const Dialog = ({ isOpen }: DialogProps) => {
                                         </ul>
                                     </label>
 
+                                    <ExampleState2Scope>
+                                        <ExampleState2State>
+                                            {
+                                                (state: ExampleState2) => (
+                                                    <a href="javascript:void(0)" onClick={onCountClick(state)}>Count: {state.count}</a>
+                                                )
+                                            }
+                                        </ExampleState2State>
+                                    </ExampleState2Scope>
+
                                     <button onClick={onCloseDialogButtonClick(state)}>Close</button>
                                     <button onClick={onAddArrayItem(state)}>Add Array Item</button>
                                 </>
                             )
                         }
-                    </State>
+                    </ExampleState1State>
                 </div>
             </div>
         </CSSTransition>
     );
 };
 
-/** Actions */
-
-const onOpenDialogButtonClick = (state: ExampleState) => () => {
-    state.message = randomString();
-    state.isOpen = !state.isOpen
-}
-
-const onCloseDialogButtonClick = (state: ExampleState) => () => state.isOpen = false;
-
-const onAddArrayItem = (state: ExampleState) => () => {
-    const item = randomString();
-    state.array.push(item);
-    if (state.array.count > 5) {
-        state.array.count = 0;
-        state.array.push(item);
-    }
-}
-
 /** Example */
 
 ReactDOM.render((
     <div id="example">
         <h1>Do you even Axial...</h1>
-        <Scope defaults={defaults}>
-            <State>
+        <ExampleState1Scope>
+            <ExampleState1State>
                 {
-                    (state: ExampleState) => (
+                    (state: ExampleState1) => (
                         <>
                             <button onClick={onOpenDialogButtonClick(state)} style={{backgroundColor: randomRGB()}}>
                                 Click to {state.isOpen ? 'Close' : 'Open'}
@@ -109,8 +132,8 @@ ReactDOM.render((
                         </>
                     )
                 }
-            </State>
-        </Scope>
+            </ExampleState1State>
+        </ExampleState1Scope>
     </div>
 ), document.getElementById('main'));
  
