@@ -1,8 +1,7 @@
 import * as React from 'react';
-import { ReactElement, useState, useEffect } from 'react';
-import { registerItem, getItem } from 'axial-store';
+import { ReactElement, createContext, useState, useEffect } from 'react';
 
-export type ScopeRenderFn<T> = (state: T) => ReactElement;
+export type StateRenderFn<T> = (state: T) => ReactElement;
 export type PlainObject = { [key: string]: any };
 export type Getter = (key: string) => void;
 export type Setter = (key: string, value: any) => void;
@@ -164,8 +163,22 @@ export class Proxy<T extends PlainObject> {
     }
 }
 
+export interface ScopeProps<T> {
+    children?: any;
+}
+
+export interface StateProps<T> {
+    children?: StateRenderFn<T>;
+}
+
+const scopes: Map<string, Proxy<any>> = new Map;
+
 function getProxy<T>(id: string): Proxy<T> | undefined {
-    return getItem(id) as Proxy<T>;
+    const proxy = scopes.get(id);
+    if (!proxy) {
+        throw new Error(`Cannot find scope "${id}"`);
+    }
+    return proxy;
 }
 
 export function getState<T>(id: string): T | undefined {
@@ -173,18 +186,68 @@ export function getState<T>(id: string): T | undefined {
     return proxy.state;
 }
 
-export function createScope<T>(id: string = 'default', defaults: T): T {
+export function createScope(id: string, defaults: PlainObject) {
+    const Context = createContext<Proxy<any>>(null);
     const proxy = new Proxy(defaults);
-    registerItem(id, proxy);
-    return proxy.state;
+    (window as any).state = proxy.state; // TODO: testing-only
+    (window as any).getState = getState; // TODO: testing-only
+    if (scopes.has(id)) {
+        throw new Error(`Scope "${id}" already exists, cannot override existing scope.`);
+    }
+    scopes.set(id, proxy);
+
+    function Scope<T>(props: ScopeProps<T>) {
+        const { children } = props;
+        return (
+            <Context.Provider value={proxy}>
+                {children}
+            </Context.Provider>
+        )
+    }
+
+    function State<T>(props: StateProps<T>) {
+        const { children } = props;
+        const [ , setValue ] = useState(0);
+
+        const handler = (key: string, value: any) => {
+            setValue(value + 1);
+        };
+
+        let proxyRef: Proxy<T>;
+
+        useEffect(() => {
+            return () => {
+                proxyRef.removeListener(handler);
+            }
+        });
+
+        return (
+            <Context.Consumer>
+                {
+                    proxy => {
+                        proxyRef = proxy;
+                        proxy.beginCaptureGetters();
+                        const result = (children as StateRenderFn<T>)(proxy.state);
+                        proxy.endCaptureGetters();
+                        proxy.accessedGetters.forEach(key => {
+                            proxy.addListener(key, handler);
+                        });
+                        return result;
+                    }
+                }
+            </Context.Consumer>
+        );
+    }
+
+    return [Scope, State];
 }
 
-export interface ScopeProps<T> {
+export interface RefProps<T> {
     from: string;
-    children?: ScopeRenderFn<T>;
+    children?: StateRenderFn<T>;
 }
 
-export function Scope<T>(props: ScopeProps<T>) {
+export function State<T>(props: RefProps<T>) {
     const { children, from } = props;
     const [ , setValue ] = useState(0);
 
@@ -201,7 +264,7 @@ export function Scope<T>(props: ScopeProps<T>) {
     });
 
     proxy.beginCaptureGetters();
-    const result = (children as ScopeRenderFn<T>)(proxy.state);
+    const result = (children as StateRenderFn<T>)(proxy.state);
     proxy.endCaptureGetters();
     proxy.accessedGetters.forEach(key => {
         proxy.addListener(key, handler);

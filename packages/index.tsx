@@ -1,7 +1,7 @@
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import { CSSTransition } from 'react-transition-group';
-import { createScope, AxialArray, getState } from 'axial';
+import { createScope, AxialArray, getState, Scope } from 'axial';
 
 import './index.less';
 
@@ -35,8 +35,11 @@ const exampleState2Defaults: ExampleState2 = {
     count: 0,
 };
 
-const [ ExampleState1Scope, ExampleState1State ] = createScope('example1', exampleState1Defaults);
-const [ ExampleState2Scope, ExampleState2State ] = createScope('example2', exampleState2Defaults);
+const Example1 = 'example1';
+const Example2 = 'example2';
+
+createScope(Example1, exampleState1Defaults);
+createScope(Example2, exampleState2Defaults);
 
 /** Actions */
 
@@ -72,7 +75,7 @@ const Dialog = ({ isOpen }: DialogProps) => {
             <div className="dialog-blanket">
                 <div className="dialog-container">
                     <h1>Dialog</h1>
-                    <ExampleState1State>
+                    <Scope from={Example1}>
                         {
                             (state: ExampleState1) => (
                                 <>
@@ -90,22 +93,22 @@ const Dialog = ({ isOpen }: DialogProps) => {
                                         </ul>
                                     </label>
 
-                                    <ExampleState2Scope>
-                                        <ExampleState2State>
-                                            {
-                                                (state: ExampleState2) => (
-                                                    <a href="javascript:void(0)" onClick={onCountClick(state)}>Count: {state.count}</a>
-                                                )
-                                            }
-                                        </ExampleState2State>
-                                    </ExampleState2Scope>
+                                    <Scope from={Example2}>
+                                        {(state: ExampleState2) => (
+                                            <a href="javascript:void(0)" onClick={onCountClick(state)}>Count: {state.count}</a>
+                                        )}
+                                    </Scope>
+
+                                    <Scope from={Example1}>
+                                        {({message}: ExampleState1) => <label>{message}</label>}
+                                    </Scope>
 
                                     <button onClick={onCloseDialogButtonClick(state)}>Close</button>
                                     <button onClick={onAddArrayItem(state)}>Add Array Item</button>
                                 </>
                             )
                         }
-                    </ExampleState1State>
+                    </Scope>
                 </div>
             </div>
         </CSSTransition>
@@ -117,28 +120,26 @@ const Dialog = ({ isOpen }: DialogProps) => {
 ReactDOM.render((
     <div id="example">
         <h1>Do you even Axial...</h1>
-        <ExampleState1Scope>
-            <ExampleState1State>
-                {
-                    (state: ExampleState1) => (
-                        <>
-                            <button onClick={onOpenDialogButtonClick(state)} style={{backgroundColor: randomRGB()}}>
-                                Click to {state.isOpen ? 'Close' : 'Open'}
-                            </button>
-                            <p>
-                                isOpen: <b>{state.isOpen ? 'true' : 'false'}</b>
-                            </p>
-                            <Dialog isOpen={state.isOpen} />
-                        </>
-                    )
-                }
-            </ExampleState1State>
-        </ExampleState1Scope>
+        <Scope from={Example1}>
+            {
+                (state: ExampleState1) => (
+                    <>
+                        <button onClick={onOpenDialogButtonClick(state)} style={{backgroundColor: randomRGB()}}>
+                            Click to {state.isOpen ? 'Close' : 'Open'}
+                        </button>
+                        <p>
+                            isOpen: <b>{state.isOpen ? 'true' : 'false'}</b>
+                        </p>
+                        <Dialog isOpen={state.isOpen} />
+                    </>
+                )
+            }
+        </Scope>
     </div>
 ), document.getElementById('main'));
 
 /** External Scope Access */
 window.addEventListener('keyup', e => {
-    const state = getState<ExampleState1>('example1');
+    const state = getState<ExampleState1>(Example1);
     e.keyCode === 27 && state.isOpen && (state.isOpen = false);
 });

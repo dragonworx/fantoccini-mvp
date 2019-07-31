@@ -23,6 +23,7 @@ module.exports = (env) => {
                 'fantoccini-kit': path.resolve(__dirname, 'packages/fantoccini-kit'),
                 'react-pubsubhub': path.resolve(__dirname, 'packages/react-pubsubhub'),
                 'axial': path.resolve(__dirname, 'packages/axial'),
+                'axial-store': path.resolve(__dirname, 'packages/axial-store'),
             }
         },
         module: {

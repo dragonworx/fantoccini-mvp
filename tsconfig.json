@@ -12,6 +12,7 @@
             "fantoccini-kit/*": [ "./fantoccini-kit/*" ],
             "react-pubsubhub/*": [ "./react-pubsubhub/*" ],
             "axial/*": [ "./axial/*" ],
+            "axial-store/*": [ "./axial-store/*" ],
         },
     },
     "include": [
