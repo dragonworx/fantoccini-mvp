@@ -6,7 +6,6 @@ export type PlainObject = { [key: string]: any };
 export type Getter = (key: string) => void;
 export type Setter = (key: string, value: any) => void;
 export type ProxyListener<T> = (key: string, value: T) => void;
-
 export type ArrayIteratorFn = (item: any, i: number, array: any[]) => any;
 
 export class ProxyArray<T> extends Array<T> {
@@ -172,14 +171,29 @@ export interface StateProps<T> {
     children?: StateRenderFn<T>;
 }
 
-export function createScope<T>(defaults: T) {
+const scopes: Map<string, Proxy<any>> = new Map;
+
+export function getState<T>(id: string): T | undefined {
+    const proxy = scopes.get(id);
+    if (proxy) {
+        return proxy.state;
+    }
+}
+
+export function createScope(id: string, defaults: PlainObject) {
     
     const Context = createContext<Proxy<any>>(null);
 
+    const proxy = new Proxy(defaults);
+    (window as any).state = proxy.state; // TODO: testing-only
+    (window as any).getState = getState; // TODO: testing-only
+    if (scopes.has(id)) {
+        throw new Error(`Scope "${id}" already exists, cannot override existing scope.`);
+    }
+    scopes.set(id, proxy);
+
     function Scope<T>(props: ScopeProps<T>) {
         const { children } = props;
-        const proxy = new Proxy(defaults);
-        (window as any).state = proxy.state;
         return (
             <Context.Provider value={proxy}>
                 {children}

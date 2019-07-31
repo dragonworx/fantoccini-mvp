@@ -1,7 +1,7 @@
 import * as React from 'react';
 import * as ReactDOM from 'react-dom';
 import { CSSTransition } from 'react-transition-group';
-import { createScope, AxialArray } from 'axial';
+import { createScope, AxialArray, getState } from 'axial';
 
 import './index.less';
 
@@ -35,8 +35,8 @@ const exampleState2Defaults: ExampleState2 = {
     count: 0,
 };
 
-const [ ExampleState1Scope, ExampleState1State ] = createScope(exampleState1Defaults);
-const [ ExampleState2Scope, ExampleState2State ] = createScope(exampleState2Defaults);
+const [ ExampleState1Scope, ExampleState1State ] = createScope('example1', exampleState1Defaults);
+const [ ExampleState2Scope, ExampleState2State ] = createScope('example2', exampleState2Defaults);
 
 /** Actions */
 
@@ -136,4 +136,9 @@ ReactDOM.render((
         </ExampleState1Scope>
     </div>
 ), document.getElementById('main'));
- 
+
+/** External Scope Access */
+window.addEventListener('keyup', e => {
+    const state = getState<ExampleState1>('example1');
+    e.keyCode === 27 && state.isOpen && (state.isOpen = false);
+});
