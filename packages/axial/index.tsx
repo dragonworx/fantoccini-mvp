@@ -41,14 +41,63 @@ export class ProxyArray<T> extends Array<T> {
         this.updateProxySetter();
     }
 
-    map(...args: any[]) {
+    /** Accessors  */
+
+    concat(...args: any[]) {
         this.updateProxyGetter();
-        return super.map.apply(this, args);
+        return super.concat.apply(this, args);
     }
 
-    find(...args: any[]) {
+    // includes(...args: any[]) {
+    //     this.updateProxyGetter();
+    //     return super.includes.apply(this, args);
+    // }
+
+    indexOf(...args: any[]) {
         this.updateProxyGetter();
-        return super.find.apply(this, args);
+        return super.indexOf.apply(this, args);
+    }
+
+    join(...args: any[]) {
+        this.updateProxyGetter();
+        return super.join.apply(this, args);
+    }
+
+    lastIndexOf(...args: any[]) {
+        this.updateProxyGetter();
+        return super.lastIndexOf.apply(this, args);
+    }
+
+    slice(...args: any[]) {
+        this.updateProxyGetter();
+        return super.slice.apply(this, args);
+    }
+
+    // toSource(...args: any[]) {
+    //     this.updateProxyGetter();
+    //     return super.toSource.apply(this, args);
+    // }
+
+    toString(...args: any[]) {
+        this.updateProxyGetter();
+        return super.toString.apply(this, args);
+    }
+
+    toLocaleString(...args: any[]) {
+        this.updateProxyGetter();
+        return super.toLocaleString.apply(this, args);
+    }
+
+    /** Iterators */
+
+    entries(...args: any[]) {
+        this.updateProxyGetter();
+        return super.entries.apply(this, args);
+    }
+
+    every(...args: any[]) {
+        this.updateProxyGetter();
+        return super.every.apply(this, args);
     }
 
     filter(...args: any[]) {
@@ -56,9 +105,63 @@ export class ProxyArray<T> extends Array<T> {
         return super.filter.apply(this, args);
     }
 
-    push(...args: any[]) {
+    find(...args: any[]) {
         this.updateProxyGetter();
-        const result = super.push.apply(this, args);
+        return super.find.apply(this, args);
+    }
+
+    findIndex(...args: any[]) {
+        this.updateProxyGetter();
+        return super.findIndex.apply(this, args);
+    }
+
+    forEach(...args: any[]) {
+        this.updateProxyGetter();
+        return super.forEach.apply(this, args);
+    }
+
+    keys(...args: any[]) {
+        this.updateProxyGetter();
+        return super.keys.apply(this, args);
+    }
+
+    map(...args: any[]) {
+        this.updateProxyGetter();
+        return super.map.apply(this, args);
+    }
+
+    reduce(...args: any[]) {
+        this.updateProxyGetter();
+        return super.reduce.apply(this, args);
+    }
+
+    reduceRight(...args: any[]) {
+        this.updateProxyGetter();
+        return super.reduceRight.apply(this, args);
+    }
+
+    some(...args: any[]) {
+        this.updateProxyGetter();
+        return super.some.apply(this, args);
+    }
+
+    values(...args: any[]) {
+        this.updateProxyGetter();
+        return super.values.apply(this, args);
+    }
+
+    /** Mutators */
+
+    copyWithin(...args: any[]) {
+        this.updateProxyGetter();
+        const result = super.copyWithin.apply(this, args);
+        this.updateProxySetter();
+        return result;
+    }
+
+    fill(...args: any[]) {
+        this.updateProxyGetter();
+        const result = super.fill.apply(this, args);
         this.updateProxySetter();
         return result;
     }
@@ -70,9 +173,44 @@ export class ProxyArray<T> extends Array<T> {
         return result;
     }
 
+    push(...args: any[]) {
+        this.updateProxyGetter();
+        const result = super.push.apply(this, args);
+        this.updateProxySetter();
+        return result;
+    }
+
+    reverse(...args: any[]) {
+        this.updateProxyGetter();
+        const result = super.reverse.apply(this, args);
+        this.updateProxySetter();
+        return result;
+    }
+
+    shift(...args: any[]) {
+        this.updateProxyGetter();
+        const result = super.shift.apply(this, args);
+        this.updateProxySetter();
+        return result;
+    }
+
+    sort(...args: any[]) {
+        this.updateProxyGetter();
+        const result = super.sort.apply(this, args);
+        this.updateProxySetter();
+        return result;
+    }
+
     splice(...args: any[]) {
         this.updateProxyGetter();
         const result = super.splice.apply(this, args);
+        this.updateProxySetter();
+        return result;
+    }
+
+    unshift(...args: any[]) {
+        this.updateProxyGetter();
+        const result = super.unshift.apply(this, args);
         this.updateProxySetter();
         return result;
     }
@@ -173,19 +311,23 @@ export function getState<T>(id: string): T | undefined {
     return proxy.state;
 }
 
-export function createScope<T>(id: string = 'default', defaults: T): T {
+function createState<T>(id: string = 'default', defaults: T): T {
     const proxy = new Proxy(defaults);
     registerItem(id, proxy);
     return proxy.state;
 }
 
-export interface ScopeProps<T> {
-    from: string;
+export interface StateProps<T> {
+    id: string;
     children?: ScopeRenderFn<T>;
 }
 
-export function Scope<T>(props: ScopeProps<T>) {
-    const { children, from } = props;
+interface StateComponent {
+    createState: <T>(id: string, defaults: T) => T;
+}
+
+function State<T>(props: StateProps<T>) {
+    const { children, id: from } = props;
     const [ , setValue ] = useState(0);
 
     const handler = (key: string, value: any) => {
@@ -208,3 +350,16 @@ export function Scope<T>(props: ScopeProps<T>) {
     });
     return result;
 }
+
+State.createState = createState;
+
+export {
+    State
+}
+
+/**
+ * TODO:
+ * create Collection & Hash proxy versions of array and Map
+ * that way API can be controlled with get/set needs
+ * safer than 98% parity from existing ProxyArray?
+ */
