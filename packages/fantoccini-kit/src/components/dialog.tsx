@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { MouseEvent } from 'react';
 import { State, useOnce } from 'axial';
 import { CSSTransition } from 'react-transition-group';
 
@@ -10,19 +11,21 @@ const timeout = {
 
 export interface IDialog {
     isOpen: boolean;
-    onClose?: () => void;
+    onCancel?: () => void;
 }
 
-export const Dialog = ({ isOpen = false, onClose }: Partial<IDialog>) => {
+export const Dialog = ({ isOpen = false, onCancel }: Partial<IDialog>) => {
     useOnce(() => {
         window.addEventListener('keyup', e => {
-            e.keyCode === 27 && (onClose && onClose());
+            e.keyCode === 27 && (onCancel && onCancel());
         });
     });
 
+    const onClick = (e: MouseEvent<HTMLDivElement>) => (e.currentTarget === e.target) && onCancel && onCancel();
+
     return (
         <CSSTransition in={isOpen} timeout={timeout} classNames="dialog" appear={true}>
-            <div className="dialog-blanket">
+            <div className="dialog-blanket" onClick={onClick}>
                 <div className="dialog-container">
                     
                 </div>

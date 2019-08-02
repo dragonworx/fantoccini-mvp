@@ -1,7 +1,7 @@
 import * as React from 'react';
 import {useState, useEffect,memo} from 'react';
 import * as ReactDOM from 'react-dom';
-import { State, useOnce } from 'axial';
+import { State, Scope, useOnce } from 'axial';
 import { Dialog, IDialog } from 'fantoccini-kit/src/components/dialog';
 
 import './index.less';
@@ -21,7 +21,7 @@ interface IExample {
 const stateRef = (state: IExample) => {
     setInterval(() => {
         state.count++
-    }, 1000);
+    }, 2000);
 }
 
 const Example = () => {
@@ -40,12 +40,12 @@ const Example = () => {
                         <div>
                             <p style={{backgroundColor: randomBg()}}>{state.count}</p>
                             <Sub count={10}/>
-                            <State defaults={{isOpen: false}}>
+                            <State defaults={{isOpen: false}} stateId="foo">
                                 {
                                     (state: IDialog) => (
                                         <>
                                         <button onClick={() => state.isOpen = true}>{state.isOpen ? 'Close' : 'Open'}</button>
-                                            <Dialog isOpen={state.isOpen} onClose={onClose(state)} />
+                                            <Dialog isOpen={state.isOpen} onCancel={onClose(state)} />
                                         </>
                                     )
                                 }
@@ -55,6 +55,11 @@ const Example = () => {
                 }
             </State>
             <Sub count={20}/>
+            <Scope stateId="foo">
+                {
+                    (state: IDialog) => <code>{state.isOpen ? 'Y' : 'N'}</code>
+                }
+            </Scope>
         </div>
     )
 }

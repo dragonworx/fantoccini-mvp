@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { ReactElement, useState, useEffect } from 'react';
+import { ReactElement, useState, useEffect, createContext } from 'react';
 import { set, get } from 'axial-store';
 
 const log = console.log;
@@ -11,7 +11,7 @@ export type Setter = (key: string, value: any) => void;
 export type ProxyListener<T> = (key: string, value: T) => void;
 export type ArrayIteratorFn = (item: any, i: number, array: any[]) => any;
 
-export class ProxyArray<T> extends Array<T> {
+export class ProxyArray extends Array {
     proxy: Proxy<any>;
     key: string;
 
@@ -222,6 +222,8 @@ export interface AxialArray<T> extends Array<T> {
     count?: number;
 }
 
+let id = 0;
+
 export class Proxy<T extends PlainObject> {
     state: T;
     listeners: Map<string, ProxyListener<any>[]> = new Map;
@@ -256,6 +258,7 @@ export class Proxy<T extends PlainObject> {
         }
     
         this.state = clone;
+        set(clone, this);
     }
 
     onGet = (key: string) => {
@@ -304,22 +307,21 @@ export class Proxy<T extends PlainObject> {
     }
 }
 
-const proxies = [];
-
 function createState<T>(defaults: T): Proxy<T> {
     const proxy = new Proxy(defaults);
-    proxies.push(proxy);
     return proxy;
 }
 
 export interface StateProps<T> {
-    defaults: T;
+    defaults?: T;
+    state?: T;
     stateRef?: (state: T) => void;
+    stateId?: string;
     children?: ScopeRenderFn<T>;
 }
 
 const State = function State<T>(props: StateProps<T>) {
-    const { children, defaults, stateRef } = props;
+    const { children, state: propState, defaults, stateRef, stateId } = props;
     const [ value, setValue ] = useState(null);
     const [ , forceUpdate ] = useState(0);
 
@@ -328,8 +330,17 @@ const State = function State<T>(props: StateProps<T>) {
     }
 
     useEffect(() => {
-        const proxy = createState(defaults);
-        const state = proxy.state;
+        let proxy: Proxy<T>;
+        let state: T;
+        if (propState) {
+            proxy = get(propState) as Proxy<T>;
+        } else {
+            proxy = createState(defaults);
+            state = proxy.state;
+            if (stateId) {
+                set(stateId, state);
+            }
+        }
         setValue(proxy);
         stateRef && stateRef(state);
     }, []);
@@ -365,6 +376,33 @@ export function useOnce (fn: (...args: any[]) => any) {
     }, []) 
 }
 
+export interface ScopeProps {
+    stateId: string;
+    children?: (state: unknown) => ReactElement;
+}
+
+export const Scope = (props: ScopeProps) => {
+    const state = get(props.stateId);
+    if (state) {
+        return (
+            <State state={state}>
+                {
+                    state => props.children(state)
+                }
+            </State>
+        )
+    }
+    return null;
+}
+
+export interface ReferenceProps {
+
+}
+
+export const Reference = (props: ReferenceProps) => {
+
+};
+
 export {
     State,
 }
@@ -374,4 +412,6 @@ export {
  * create Collection & Hash proxy versions of array and Map
  * that way API can be controlled with get/set needs
  * safer than 98% parity from existing ProxyArray?
+ * 
+ * Nested Proxies whch all point back to root one for changes
  */
