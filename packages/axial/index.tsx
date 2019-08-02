@@ -1,6 +1,8 @@
 import * as React from 'react';
 import { ReactElement, useState, useEffect } from 'react';
-import { registerItem, getItem } from 'axial-store';
+import { set, get } from 'axial-store';
+
+const log = console.log;
 
 export type ScopeRenderFn<T> = (state: T) => ReactElement;
 export type PlainObject = { [key: string]: any };
@@ -302,59 +304,69 @@ export class Proxy<T extends PlainObject> {
     }
 }
 
-function getProxy<T>(id: string): Proxy<T> | undefined {
-    return getItem(id) as Proxy<T>;
-}
+const proxies = [];
 
-export function getState<T>(id: string): T | undefined {
-    const proxy = getProxy<T>(id);
-    return proxy.state;
-}
-
-function createState<T>(id: string = 'default', defaults: T): T {
+function createState<T>(defaults: T): Proxy<T> {
     const proxy = new Proxy(defaults);
-    registerItem(id, proxy);
-    return proxy.state;
+    proxies.push(proxy);
+    return proxy;
 }
 
 export interface StateProps<T> {
-    id: string;
+    defaults: T;
+    stateRef?: (state: T) => void;
     children?: ScopeRenderFn<T>;
 }
 
-interface StateComponent {
-    createState: <T>(id: string, defaults: T) => T;
-}
+const State = function State<T>(props: StateProps<T>) {
+    const { children, defaults, stateRef } = props;
+    const [ value, setValue ] = useState(null);
+    const [ , forceUpdate ] = useState(0);
 
-function State<T>(props: StateProps<T>) {
-    const { children, id: from } = props;
-    const [ , setValue ] = useState(0);
+    const handler = (k: string, v: any) => {
+        forceUpdate(Math.random());
+    }
 
-    const handler = (key: string, value: any) => {
-        setValue(value + 1);
-    };
-
-    const proxy = getProxy<T>(from);
+    useEffect(() => {
+        const proxy = createState(defaults);
+        const state = proxy.state;
+        setValue(proxy);
+        stateRef && stateRef(state);
+    }, []);
 
     useEffect(() => {
         return () => {
+            if (!value) {
+                return;
+            }
+            const proxy = value as Proxy<T>;
             proxy.removeListener(handler);
         }
     });
 
+    if (!value) {
+        return null;
+    }
+
+    const proxy = value as Proxy<T>;
     proxy.beginCaptureGetters();
-    const result = (children as ScopeRenderFn<T>)(proxy.state);
+    const result = (children as ScopeRenderFn<T>)(proxy.state as T);
     proxy.endCaptureGetters();
     proxy.accessedGetters.forEach(key => {
         proxy.addListener(key, handler);
-    });
+    })
+
     return result;
 }
 
-State.createState = createState;
+export function useOnce (fn: (...args: any[]) => any) {
+    useEffect(() => {
+        fn();
+    }, []) 
+}
 
 export {
-    State
+    State,
 }
 
 /**

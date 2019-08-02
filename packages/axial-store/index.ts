@@ -1,30 +1,30 @@
-const store: Map<string, any> = new Map;
+const map: Map<any, any> = new Map;
 
-export function registerItem(id: string, item: any) {
-    if (store.has(id)) {
-        throw new Error(`Register failed. Item exists "${id}"`);
+export function set(key: any, value: any) {
+    if (map.has(key)) {
+        throw new Error(`Register failed. Item exists "${key}"`);
     }
-    store.set(id, item);
+    map.set(key, value);
 }
 
-export function getItem(id: string) {
-    if (!store.has(id)) {
-        throw new Error(`Get failed. Item not found "${id}"`);
+export function get(key: any) {
+    if (!map.has(key)) {
+        throw new Error(`Get failed. Item not found "${key}"`);
     }
-    return store.get(id);
+    return map.get(key);
 }
 
-export function removeItem(id: string) {
-    if (!store.has(id)) {
-        throw new Error(`Remove failed. Item not found "${id}"`);
+export function remove(key: any) {
+    if (!map.has(key)) {
+        throw new Error(`Remove failed. Item not found "${key}"`);
     }
-    store.delete(id);
+    map.delete(key);
 }
 
-export function renameItem(id: string, newId: string) {
-    if (!store.has(id)) {
-        throw new Error(`Rename failed. Item not found "${id}"`);
+export function rename(oldKey: any, newKey: any) {
+    if (!map.has(oldKey)) {
+        throw new Error(`Rename failed. Item not found "${oldKey}"`);
     }
-    store.set(newId, store.get(id));
-    store.delete(id);
+    map.set(newKey, map.get(oldKey));
+    map.delete(oldKey);
 }
