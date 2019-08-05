@@ -1,7 +1,8 @@
 import * as React from 'react';
-import {useState, useEffect,memo} from 'react';
+import { useState } from 'react';
 import * as ReactDOM from 'react-dom';
-import { State, Scope, useOnce } from 'axial';
+import { State, Scope, array } from 'axial';
+import { useOnce } from 'fantoccini-kit';
 import { Dialog, IDialog } from 'fantoccini-kit/src/components/dialog';
 
 import './index.less';
@@ -14,38 +15,53 @@ const randomBg = () => {
     return `rgb(${r},${g},${b})`;
 }
 
-interface IExample {
-    count: number;
+interface Item {
+    title: string;
 }
 
-const stateRef = (state: IExample) => {
+interface Example {
+    count: number;
+    items?: Item[];
+}
+
+const stateRef = (state: Example) => {
     setInterval(() => {
         state.count++
     }, 2000);
 }
 
-const Example = () => {
+const App = () => {
     const [value, setValue ] = useState(0);
 
     useOnce(()=> setInterval(() => setValue(Math.random()), 4000));
 
-    const onClose = (state: IDialog) => () => state.isOpen && (state.isOpen = false);
+    const onClose = (dialog: IDialog) => () => dialog.isOpen && (dialog.isOpen = false);
 
     return (
         <div id="example" style={{backgroundColor: randomBg()}}>
             <h1>Example {value}</h1>
-            <State defaults={{count: 1}} stateRef={stateRef}>
+            <State defaults={{count: 1, items: [{title:'a'},{title:'b'},{title:'c'}]}} stateRef={stateRef}>
                 {
-                    (state: IExample) => (
+                    (example: Example) => (
                         <div>
-                            <p style={{backgroundColor: randomBg()}}>{state.count}</p>
+                            <p style={{backgroundColor: randomBg()}}>{example.count}</p>
+                            <ul>
+                                {
+                                    array(example.items).map((item: Item, i: number) => <li key={i}>{item.title}</li>)
+                                }
+                            </ul>
+                            <button onClick={() => array(example.items).add({title: example.count})}>Add Item</button>
                             <Sub count={10}/>
                             <State defaults={{isOpen: false}} stateId="foo">
                                 {
-                                    (state: IDialog) => (
+                                    (dialog: IDialog) => (
                                         <>
-                                        <button onClick={() => state.isOpen = true}>{state.isOpen ? 'Close' : 'Open'}</button>
-                                            <Dialog isOpen={state.isOpen} onCancel={onClose(state)} />
+                                            <button onClick={() => dialog.isOpen = true}>
+                                                {dialog.isOpen ? 'Close' : 'Open'}
+                                            </button>
+                                            <Dialog isOpen={dialog.isOpen} onCancel={onClose(dialog)}>
+                                                <h1>Dialog</h1>
+                                            </Dialog>
                                         </>
                                     )
                                 }
@@ -64,8 +80,8 @@ const Example = () => {
     )
 }
 
-const Sub = (props: IExample) => {
-    const stateRef = (state: IExample) => {
+const Sub = (props: Example) => {
+    const stateRef = (state: Example) => {
         setInterval(() => {
             state.count++
         }, 1500);
@@ -76,7 +92,7 @@ const Sub = (props: IExample) => {
             <h2>Sub</h2>
             <State defaults={{count: props.count}} stateRef={stateRef}>
                 {
-                    (state: IExample) => (
+                    (state: Example) => (
                         <p style={{backgroundColor: randomBg()}}>{state.count}</p>
                     )
                 }
@@ -86,5 +102,5 @@ const Sub = (props: IExample) => {
 }
 
 ReactDOM.render((
-    <Example/>
+    <App/>
 ), document.getElementById('main'));

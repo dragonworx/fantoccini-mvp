@@ -1,5 +1,5 @@
 import * as React from 'react';
-import { ReactNode, ReactElement} from 'react';
+import { ReactNode, ReactElement, useEffect } from 'react';
 
 export function cloneChildren(keyPrefix: string, propsChildren: ReactNode, resolver?: (child: ReactElement<any>) => {}) {
     const children: any[] = React.Children.map(propsChildren, (child: ReactElement<any>, i: number) => {
@@ -39,4 +39,17 @@ export function px(num: number): string | undefined {
 
 export function css(str: string, value: any) {
     return value ? str.replace('$', value) : undefined;
+}
+
+export function useOnce(fn: (...args: any[]) => any) {
+    useEffect(() => {
+        fn();
+    }, []) 
+}
+
+export function useWindowEvent(eventName: string, handler: EventListener) {
+    useEffect(() => {
+        window.addEventListener(eventName, handler);
+        return () => window.removeEventListener(eventName, handler)
+    })
 }
