@@ -47,41 +47,79 @@ export const ArrayMembers = {
     ]
 }
 
-export type Listener = (target: any, path: string, value: any, context: ProxyRootContext) => any;
+export type ListenerHandler = (target: any, path: string, value: any, context: ProxyRootContext) => any;
+
+export type ListenerType = 'get' | 'set' | 'mutate';
+
 export interface ListenerRef {
-    listener: Listener;
-    type: 'get' | 'set' | 'mutate';
+    type: ListenerType;
+    path: string;
+    handler: ListenerHandler;
 }
 
 export class ProxyRootContext {
     id: number;
-    listeners: ListenerRef[] = [];
+    listeners: {[key: string]: ListenerRef[]} = {
+        'get': [],
+        'set': [],
+        'mutate': [],
+    };
+    captureGetters: boolean = false;
+    accessedGetters: string[] = [];
 
     constructor(readonly root: any) {
         this.id = contextId++;
     }
 
-    addListener(type: 'get' | 'set' | 'mutate', listener: Listener) {
-        this.listeners.push({
-            listener,
+    addListener(type: ListenerType, path: string, handler: ListenerHandler) {
+        this.listeners[type].push({
             type,
+            path,
+            handler,
         });
     }
+    
+    removeListener(type: ListenerType, handler: ListenerHandler) {
+        const array = this.listeners[type];
+        const ref = array.find((ref, i) => ref.handler === handler);
+        if (ref) {
+            const index = array.indexOf(ref);
+            array.splice(index, 1);
+            return;
+        }
+    }
 
-    dispatch(target: any, path: string, value?: any) {
-
+    dispatch(type: ListenerType, target: any, path: string, value?: any) {
+        const array = this.listeners[type];
+        array.forEach(ref => ref.handler(target, path, value, this));
     }
 
     onGet(target: any, path: string) {
-        
+        // log({ type: 'get', path, target});
+        if (this.captureGetters) {
+            if (this.accessedGetters.indexOf(path) === -1) {
+                this.accessedGetters.push(path);
+            }
+        }
     }
 
     onSet(target: any, path: string, value: any) {
-        
+        // log({ type: 'set', path, value, target});
+        this.dispatch('set', target, path, value);
     }
 
     onMutate(target: any, path: string) {
-        
+        // log({ type: 'mutate', path, target});
+        this.dispatch('mutate', target, path);
+    }
+
+    beginCaptureGetters() {
+        this.accessedGetters.length = 0;
+        this.captureGetters = true;
+    }
+
+    endCaptureGetters() {
+        this.captureGetters = false;
     }
 }
 
@@ -117,12 +155,16 @@ export function wrapProxy<T>(source: T, path?: string, context?: ProxyRootContex
             const typeofKey = typeof key;
             key = key as string;
             const subPath = getPath(key, path);
-            const proxyContext = wrapProxy(src[key], subPath, context);
-            context.onGet(subPath, proxyContext.value);
+            let value = src[key];
+            // if (isArray(value) || isObject(value)) {
+            //     const proxyContext = wrapProxy(value, subPath, context);
+            //     value = proxyContext.value;
+            // }
+            context.onGet(subPath, value);
             if (isArray(target) && (ArrayMembers.Mutators.indexOf(key) > -1) || (typeofKey === 'number')) {
                 context.onMutate(target, subPath);
             }
-            return proxyContext.value;
+            return value;
         },
         set(target, key, value, receiver) {
             const subPath = getPath(key as string, path);

@@ -1,63 +1,122 @@
 import * as React from 'react';
+import { useState } from 'react';
 import * as ReactDOM from 'react-dom';
-import { State,  Read, Store } from 'react-pubsubhub';
-import { CSSTransition } from 'react-transition-group';
+import { State, Scope } from 'axial';
+import { useOnce } from 'fantoccini-kit';
+import { Dialog, IDialog } from 'fantoccini-kit/src/components/dialog';
 
-import 'fantoccini-kit/src/less/react-pubsubhub-demo';
+import './index.less';
+const log = console.log;
 
-const onOpenDialogButtonClick = (state: ExampleState) => () => state.isOpen = true;
-const onCloseDialogButtonClick = (state: ExampleState) => () => state.isOpen = false;
-
-interface DialogProps {
-    isOpen: boolean;
+const randomBg = () => {
+    const r = Math.round(Math.random() * 255);
+    const g = Math.round(Math.random() * 255);
+    const b = Math.round(Math.random() * 255);
+    return `rgb(${r},${g},${b})`;
 }
 
-const Dialog = ({isOpen}: DialogProps) => {
-    const timeout={
-        appear: 1000,
-        enter: 1000,
-        exit: 200,
-    };
+interface Item {
+    title: string;
+}
+
+interface Example {
+    count: number;
+    items?: Item[];
+}
+
+const stateRef = (state: Example) => {
+    setInterval(() => {
+        state.count++
+    }, 2000);
+}
+
+const App = () => {
+    const [value, setValue ] = useState(0);
+
+    useOnce(()=> setInterval(() => setValue(Math.random()), 4000));
+
+    const onClose = (dialog: IDialog) => () => dialog.isOpen && (dialog.isOpen = false);
 
     return (
-        <CSSTransition in={isOpen} timeout={timeout} classNames="dialog" appear={isOpen}>
-            <div className="dialog-blanket">
-                <div className="dialog-container">
-                    <h1>Dialog</h1>
-                    <State>
-                        { state => <button onClick={onCloseDialogButtonClick(state)}>Close</button>}
-                    </State>
-                </div>
-            </div>
-        </CSSTransition>
-    );
-};
-
-interface ExampleState {
-    isOpen: boolean;
+        <div id="example" style={{backgroundColor: randomBg()}}>
+            <h1>Example {value}</h1>
+            <State defaults={{count: 1, items: [{title:'a'},{title:'b'},{title:'c'}]}} stateRef={stateRef}>
+                {
+                    (example: Example) => (
+                        <div>
+                            <p style={{backgroundColor: randomBg()}}>{example.count}</p>
+                            <ul>
+                                {
+                                    example.items.map((item: Item, i: number) => <li key={i}>{item.title}</li>)
+                                }
+                            </ul>
+                            <button onClick={() => example.items.push({title: example.count.toString()})}>Add Item</button>
+                            <Sub count={10}/>
+                            <State defaults={{isOpen: false}} stateId="foo">
+                                {
+                                    (dialog: IDialog) => (
+                                        <>
+                                            <button onClick={() => dialog.isOpen = true}>
+                                                {dialog.isOpen ? 'Close' : 'Open'}
+                                            </button>
+                                            <Dialog isOpen={dialog.isOpen} onCancel={onClose(dialog)}>
+                                                <h1>Dialog</h1>
+                                            </Dialog>
+                                        </>
+                                    )
+                                }
+                            </State>
+                        </div>
+                    )
+                }
+            </State>
+            <Sub count={20}/>
+            <Scope stateId="foo">
+                {
+                    (state: IDialog) => <code>{state.isOpen ? 'Y' : 'N'}</code>
+                }
+            </Scope>
+        </div>
+    )
 }
 
-const stateRef = (state: ExampleState) => {
-    window.addEventListener('keyup', e => {
-        if (e.keyCode === 27 && state.isOpen) {
-            state.isOpen = true;
-        }
-    });
-};
+const Sub = (props: Example) => {
+    const stateRef = (state: Example) => {
+        setInterval(() => {
+            state.count++
+        }, 1500);
+    }
 
-const defaults: ExampleState = {
-    isOpen: false,
-};
+    return (
+        <div>
+            <h2>Sub</h2>
+            <State defaults={{count: props.count}} stateRef={stateRef}>
+                {
+                    (state: Example) => (
+                        <p style={{backgroundColor: randomBg()}}>{state.count}</p>
+                    )
+                }
+            </State>
+        </div>
+    )
+}
+
+const App2 = () => (
+    <div>
+        <State defaults={{count: 1}}>
+            {
+                (state: Example) => (
+                    <div>
+                        <h1>Test</h1>
+                        {state.count}
+                        <button onClick={() => state.count++}>Click</button>
+                    </div>
+                )
+            }
+        </State>
+    </div>
+);
 
 ReactDOM.render((
-    <Store defaults={defaults}>
-        <State>
-            { (state: ExampleState) => <button onClick={onOpenDialogButtonClick(state)}>Open Dialog</button> }
-        </State>
-        <Read from={(state: ExampleState) => state.isOpen}>
-            { (isOpen: boolean) => <Dialog isOpen={isOpen} /> }
-        </Read>
-    </Store>
+    <App />
 ), document.getElementById('main'));
-
-// make it more like state, set state with values under a key, clear the key

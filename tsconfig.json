@@ -13,6 +13,7 @@
             "react-pubsubhub/*": [ "./react-pubsubhub/*" ],
             "axial/*": [ "./axial/*" ],
             "axial-store/*": [ "./axial-store/*" ],
+            "trace/*": [ "./trace/*" ],
         },
     },
     "include": [

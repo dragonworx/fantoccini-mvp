@@ -24,6 +24,7 @@ module.exports = (env) => {
                 'react-pubsubhub': path.resolve(__dirname, 'packages/react-pubsubhub'),
                 'axial': path.resolve(__dirname, 'packages/axial'),
                 'axial-store': path.resolve(__dirname, 'packages/axial-store'),
+                'trace': path.resolve(__dirname, 'packages/trace'),
             }
         },
         module: {

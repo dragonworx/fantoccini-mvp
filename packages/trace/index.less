@@ -1,0 +1,74 @@
+@lineHeight: 20px;
+
+#main {
+    overflow: auto;
+}
+
+.trace, .trace * {
+    box-sizing: border-box;
+}
+
+.trace {
+    background-color: white;
+    top: 0px;
+    right:  0px;
+    display: flex;
+    flex-direction: row;
+    position: absolute;
+}
+
+.gutter {
+    background-color: #ccc;
+}
+
+.line {
+    height: @lineHeight;
+    border-bottom: 1px solid black;
+    width: 100%;
+    position: absolute;
+    left: 0;
+}
+
+.timestamp {
+    background-color: #ccc;
+}
+
+.time {
+    color: blue;
+    height: @lineHeight;
+    text-align: right;
+}
+
+.time:first-child {
+    background-color: black;
+}
+
+.actor {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+    border-right: 1px solid black;
+}
+
+.actor:last-child {
+    border-right: none;
+}
+
+.header {
+    background-color: black;
+    color: white;
+    font-weight: bold;
+    position: sticky;
+    top: -5px;
+}
+
+.event {
+    height: @lineHeight;
+}
+
+.badge {
+    background-color: red;
+    color: white;
+    border-radius: 10px;
+    padding: 0 5px;
+}
